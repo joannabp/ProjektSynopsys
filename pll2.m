@@ -6,6 +6,7 @@ clk_in=zeros(1,N);
 clk_out=zeros(1,N);
 pam4_vect=[00 01 00 01 11 10 01 00 00 01 00 01 11 10 01 00 00 01 00 01 11 10 01 00 00 01 00 01 11 10 01 00 00 01 00 01 11 10 01 00 00 01 00 01 11 10 01 00 00 01 00 01 11 10 01 00 00 01 00 01 11 10 01 00];
 j=2;
+nadp=2;
 start_in=0;
 start_out=0;
 while(j<=N)
@@ -36,20 +37,20 @@ for i=2:N
 				slope_sum=slope_sum+1;
 				if(start_in==0)
 					start_in=i;
-					end
+				end
 		end
 end
 if(f_clk~=slope_sum)
 	clk_out(1)=clk_in(1);
 	j=2;
 	while(j<=N)
-		x2(j)=mod(j,N/slope_sum);
-		if(mod(j,N/slope_sum)<1)
+		x2(j)=mod(j,N/(slope_sum*nadp));
+		if(mod(j,N/(slope_sum*nadp))<1)
 			printf('found_out');
 			clk_out(j)=-clk_out(j-1)+1;
 			if(start_out==0)
 				start_out=j;
-				end
+			end
 		else
 			clk_out(j)=clk_out(j-1);
 		end
@@ -57,21 +58,23 @@ if(f_clk~=slope_sum)
 	end
 end
 del=0;
-if(start_in~=start_out)
-	 while(start_in~=start_out)
-		clk_out=delay(clk_out,N/slope_sum);
+if(start_out~=ceil(start_in/nadp))
+	while(1)
+		clk_out=delay(clk_out,(N/(slope_sum*nadp)));
 		del=del+1;
 		for i=2:N
 			if(clk_out(i)~=clk_out(i-1))
 				start_out=i;
+				printf('start is %d',i);
 				break;
 			end
 		end
-	if(start_in==start_out)
-		break;
+		if(start_out==ceil(start_in/nadp))
+			break;
+		end
 	end
 end
-end
+
 
 	
 # for i=2:N

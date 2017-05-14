@@ -10,18 +10,23 @@ function signal_d=delay(signal,okres)
     # else
         # signal_d(1)=0;
     # end
-	j=2;
-	while(1)
-		if(signal_d(j)==signal_d(j-1))
-			j=j+1;
-		else
-			break;
-		end
-	end
-	if(j<okres)
-		signal_d(1)=signal_d(2);
-	else
-		signal_d(1)=-signal_d(2)+1;
-	end
-  #  signal_d(1)=signal(length(signal));
+# j=1;
+# while(signal_d(j)==0)
+	# j=j+1;
+# end;
+# if(j<okres)
+	# k
+# 
+j=2;
+while(signal_d(j)==signal_d(j-1))
+	j=j+1;
+end
+if(j<okres)
+	signal_d(1)=signal_d(2);
+else
+	signal_d(1)=-signal_d(2)+1;
+end
+  signal_d(1)=signal(length(signal));
+if(signal_d(1)==1)
+	signal_d=-signal_d+1;
 end
