@@ -6,7 +6,7 @@ clk_in=zeros(1,N);
 clk_out=zeros(1,N);
 pam4_vect=[00 01 00 01 11 10 01 00 00 01 00 01 11 10 01 00 00 01 00 01 11 10 01 00 00 01 00 01 11 10 01 00 00 01 00 01 11 10 01 00 00 01 00 01 11 10 01 00 00 01 00 01 11 10 01 00 00 01 00 01 11 10 01 00];
 j=2;
-nadp=2;
+nadp=3;
 start_in=0;
 start_out=0;
 while(j<=N)
@@ -58,9 +58,8 @@ if(f_clk~=slope_sum)
 	end
 end
 del=0;
-if(start_out~=ceil(start_in/nadp))
-	while(1)
-		clk_out=delay(clk_out,(N/(slope_sum*nadp)));
+while(start_out~=ceil(start_in/nadp)+2)
+		clk_out=delay(clk_out,(N/(slope_sum*nadp+2)));
 		del=del+1;
 		for i=2:N
 			if(clk_out(i)~=clk_out(i-1))
@@ -69,10 +68,10 @@ if(start_out~=ceil(start_in/nadp))
 				break;
 			end
 		end
-		if(start_out==ceil(start_in/nadp))
-			break;
-		end
-	end
+		# if(start_out==ceil(start_in/nadp))
+			# break;
+		# end
+	#end
 end
 
 
