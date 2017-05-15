@@ -1,7 +1,7 @@
 
 function signal_d=delay(signal,okres)
  #start=signal2(1);
- signal_d=signal;
+ #signal_d=signal;
     for i=2:length(signal)
         signal_d(i)=signal(i-1);
     end
@@ -18,7 +18,7 @@ function signal_d=delay(signal,okres)
 	# k
 # 
 j=1;
-while(signal_d(j)==signal_d(j+1))
+while((signal_d(j)==signal_d(j+1))&&(j<(length(signal)-1)))
 	j=j+1;
 end
 if(j<okres)

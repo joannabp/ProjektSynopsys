@@ -25,8 +25,8 @@ c200=[];
 c0=[];
 cm200=[];
 
-for i=1:vector_length 
-    if ind(i)==1
+for i=2:vector_length 
+    if (clk(i)>clk(i-1))
         c200(j)=input_vector(i)>200;
         c0(j)=input_vector(i)>0;
         cm200(j)=input_vector(i)<-200;
@@ -79,7 +79,7 @@ for k=1:m-2
         a=a+1;
     elseif (eye(k,2)>=-100 && eye(k,2)<=100)
         eyeO2(b)=eye(k,2);
-        eye(k,2)
+        eye(k,2);
         b=b+1;
     end
     %else if
@@ -101,7 +101,7 @@ min_eye100_300=max(diff(eyeO3_sort));
 data=out_data;
 setup=1;
 hold=1;
-% 3 cykle zegara zestawiæ ze sob¹ 
+% 3 cykle zegara zestawia ze sob1 
 % t is here that we introduce SETUP and HOLD time. Setup time is defined as the minimum amount of time before the clock's active edge that the data must be stable for it to be latched correctly. Any violation may cause incorrect data to be captured, which is known as setup violation.
 % 
 % Hold time is defined as the minimum amount of time after the clock's active edge during which data must be stable. Violation in this case may cause incorrect data to be latched, which is known as a hold violation. Note that setup and hold time is measured with respect to the active clock edge only.
