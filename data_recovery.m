@@ -9,7 +9,7 @@ global vector_length;
 
 thresh=0.5
 ind= clk>thresh; %-----------rising edge vector
-%ind=[0 diff(ind)>0]>0;
+ind=[0 diff(ind)>0]>0;
 
 t=1:length(clk);
 
