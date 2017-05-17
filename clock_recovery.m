@@ -25,11 +25,11 @@ while(v_df>0||t_clk~=t_vco) 											%petla wykonywana do osiagniecia zgodnosc
 		end
 	end
 	
-	# for i=1:start																		%opóznienie startowe w oczekiwaniu na pierwsza probke
+	# for i=1:start																	
 		# clk_out(i)=0;
 	# end
-	clk_out=clk_gen(t_clk,start);
-	# for i=start_in+1:vector_length									%wypelnianie wektora zegara wyjsciowego z nowym okresem
+	clk_out=clk_gen(t_clk,start);										%generacja zegara z nowym opóznieniem startowym i okresem
+	# for i=start_in+1:vector_length								
 		# if(mod(i-start_in,t_clk)<floor(t_clk/2)) 
         # clk_out(i)=1; 																
 		# else
@@ -38,7 +38,7 @@ while(v_df>0||t_clk~=t_vco) 											%petla wykonywana do osiagniecia zgodnosc
 	# end
 	
 	if(start~=start_out)
-		start=slope(clk_out);
+		start=slope(clk_out);													%znajdowanie pierwszego zbocza zegara
 		# for i=2:N
 			# if(clk_out(i)>clk_out(i-1))
 				# start_in=i;

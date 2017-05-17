@@ -1,6 +1,5 @@
 function clk_out=clock_recovery(clk_in,t_clk)
 global vector_length;
-clk_temp=zeros(1,vector_length);
 clk_out=zeros(1,vector_length);
 t_vco=31;																					%docelowy okres zegara wyjsciowego
 start=0;  
@@ -29,7 +28,7 @@ while(v_df>0||t_clk~=t_vco) 											%petla wykonywana do osiagniecia zgodnosc
 	# for i=1:start																		%opóznienie startowe w oczekiwaniu na pierwsza probke
 		# clk_out(i)=0;
 	# end
-	clk_out=clk_gen(t_clk,start);
+	clk_out=clk_gen(t_clk,start);										%generacja zegara z nowym opóznieniem startowym i okresem
 	# for i=start_in+1:vector_length									%wypelnianie wektora zegara wyjsciowego z nowym okresem
 		# if(mod(i-start_in,t_clk)<floor(t_clk/2)) 
         # clk_out(i)=1; 																
@@ -48,6 +47,5 @@ while(v_df>0||t_clk~=t_vco) 											%petla wykonywana do osiagniecia zgodnosc
 			# end
 		# end
 	end
-	%clk_temp=clk_out;
 	v_df=k_df*abs(start_out-start);							%obliczanie nowego napiecia detektora fazy
 end
