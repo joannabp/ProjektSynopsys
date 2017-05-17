@@ -1,9 +1,12 @@
 
-function slope=slope(signal1,signal2)
- if(abs(signal1-signal2)>=190)
-    slope=1;
-		%printf('found_in');
- else
-    slope=0;
+function start=slope(clk)
+global vector_length;
+	start=0;
+	i=2;
+	while((start==0)&&(i<=vector_length))
+		if(clk(i)>clk(i-1))
+			start=i;
+	end
+	i=i+1;
 	end
 end

@@ -1,4 +1,4 @@
-function [data, min_eye300_100, min_eye100_100, min_eye100_300, setup, hold]=data_recovery(input_vector, clk);
+function [out_data, min_eye300_100, min_eye100_100, min_eye100_300, setup, hold, out]=data_recovery(input_vector, clk);
 global vector_length;
 %global minimum_eye_opening;
 %global setup_t;
@@ -7,7 +7,7 @@ global vector_length;
 %-------rising edge detection ------%
 %clk=[0 0 1 1 0 0 1 1 0 0 1 1 1 0 0 1 0 0 0 0 0 1 1 0 0 1 1 0 0 1 1 1 0 0 1 0 0 0 0 0 1 1 0 0 1 1 0 0 1 1 1 0 0 1 0 0 0 0 0 1 1 0 0 1 1 0 0 1 1 1 0 0 1 0 0 0 0 0 1 1 0 0 1 1 0 0 1 1 1 0 0 1 0 0 0 0 1 0 0 0 1];
 
-thresh=0.5
+thresh=0.5;
 ind= clk>thresh; %-----------rising edge vector
 ind=[0 diff(ind)>0]>0;
 
@@ -17,7 +17,8 @@ t=1:length(clk);
 %s1=randi(300,1, 50);
 %s2=(-1)*randi(300,1, 50);
 %s=horzcat(s1,s2);
-out=[];
+%out=[];
+%out_data=[];
 j=1;
 
 
@@ -32,8 +33,8 @@ for i=1:vector_length
         cm200(j)=input_vector(i)<-200;
              j=j+1;  
     end
-
 end 
+
 j=j-1;
 for i=1:j
         if c200(i)==1
@@ -47,7 +48,15 @@ for i=1:j
         end
 end
 
+# out=out';
+# for i=1:2:j
+	# out=out';
+	# printf("converting %d \n",out(1,i));
+	# # printf(dec2bin(out(1,i),2));
+	# out_data=cellstr(dec2bin(out(1,i),2));
+# end
 out_data=cellstr(dec2bin(out,2))';
+
 m=1;
 e=[];
 for k=1:vector_length 
@@ -79,7 +88,7 @@ for k=1:m-2
         a=a+1;
     elseif (eye(k,2)>=-100 && eye(k,2)<=100)
         eyeO2(b)=eye(k,2);
-        eye(k,2)
+        eye(k,2);
         b=b+1;
     end
     %else if
