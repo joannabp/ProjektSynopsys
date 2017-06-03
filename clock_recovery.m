@@ -1,8 +1,8 @@
 function clk_out=clock_recovery(clk_in,t_clk)
 global vector_length;
-clk_out=zeros(1,vector_length);
 t_vco_start=20;																		%okres sygnalu wyjsciowego vco przy zerowym napieciu detektora fazy
 start_out=14; 																		
+clk_out=clk_gen_id(t_vco_start,start_out);
 k_df=10; 																					%wspolczynnik napiecia detektora fazy
 v_df=0; 																					%napiecie wyjsciowe detektora fazy
 start=slope(clk_in); 															%wykrywanie pierwszego zbocza zegara wejsciowego
@@ -11,12 +11,14 @@ v_df=k_df*abs(start_out-start); 									%obliczenie poczatkowego napiecia detek
 while(v_df>0||t_clk~=t_vco) 											%petla wykonywana do osiagniecia zgodnosci faz i czestotliwosci zegarów
 
 		if(t_vco>t_clk)
-			t_vco=t_vco-1; 															
+			t_vco=t_vco-1; 			
+      printf("zmniejszany okres, t_vco = %d \n",t_vco);      
     elseif(t_vco<t_clk)	
-			t_vco=t_vco+1; 																		    %zmniejszany okres
+			t_vco=t_vco+1; 	
+      printf("zwiekszamy okres, t_vco = %d \n",t_vco);     																	    
     end
 
-	clk_out=clk_gen(t_vco,start_out);										%generacja zegara z nowym opóznieniem startowym i okresem
+	clk_out=clk_gen_id(t_vco,start_out);										%generacja zegara z nowym opóznieniem startowym i okresem
 	
 	if(start~=start_out)
 		start_out=slope(clk_out);													%znajdowanie pierwszego zbocza zegara
