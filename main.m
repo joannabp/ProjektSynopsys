@@ -1,9 +1,21 @@
 clear all;
 close all;
 clc
-global vector_length;
 
+global vector_length;
 vector_length=1600;
+
+input_vector_length=100;
+over_sampling = 16;
+freq = 10^10;     % 10GHz
+T = 1/freq;       % 0.1ns
+
+time = (0:T/over_sampling:T*input_vector_length-(T/over_sampling));
+clk_ideal=clk_ideal_gen(input_vector_length,over_sampling);
+
+plot(time,clk_ideal)
+
+
 input_data = randi([0 1], 100, 1);
 %t_clk=randi(64,1,1)+1;
 %start=randi(30,1,1);
@@ -13,18 +25,18 @@ clk_in = clk_gen(t_clk,start);
 %clk_tst=zeros(1,vector_length);
 data_out=zeros(1,vector_length);
 
-%---------------------driver----------------------------------------------%
+%---------------------Driver----------------------------------------------%
 
 driv_data = driv_script(input_data);
 
 %---------------------Channel---------------------------------------------%
 
-%channel_data = channel(driv_data,100);
-# for i=2:vector_length
-	# if(abs(driv_data(i)-driv_data(i-1))>=100)
-		# clk_tst(i)=1;
-	# end
-# end
+channel_data = driv_data;
+%# for i=2:vector_length
+%	# if(abs(driv_data(i)-driv_data(i-1))>=100)
+%		# clk_tst(i)=1;
+%	# end
+%# end
 
 %---------------------Clock_Recovery--------------------------------------%
 
@@ -32,7 +44,9 @@ clk_out=clock_recovery(clk_in,t_clk);
 
 %---------------------Data_Recovery---------------------------------------%
 
-[data, min_eye300_100, min_eye100_100, min_eye100_300, setup, hold, out] = data_recovery(driv_data, clk_out);
+%[data, min_eye300_100, min_eye100_100, min_eye100_300, setup, hold, out] = data_recovery(driv_data, clk_out);
+[data, min_eye300_100, min_eye100_100, min_eye100_300, setup, hold, out] = data_recovery(channel_data, clk_out);
+
 
 nums_str=[data{:}];
 nums_split=[];
@@ -50,7 +64,7 @@ end
 %---------------------Dodatki---------------------------------------------%
 
 plot(driv_data);
-ylabel("data in");
+ylabel('data in');
 figure
 plot(clk_in);
 ylabel('clk in');
@@ -60,3 +74,4 @@ ylabel('clk out');
 figure
 plot(data_out);
 ylabel('data out');
+
