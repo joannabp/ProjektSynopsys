@@ -17,15 +17,16 @@ hold_t=1;
 
 min_eye_opening=10;
 
-input_vector_length=100;
+input_bytes=200;   % number of imput bytes
+input_bits=input_bytes*8;
 over_sampling = 16;
 freq = 10^10;     % 10GHz
 T = 1/freq;       % 0.1ns
+   % number of imput bits
+time = (0:T/over_sampling:T*input_bits-(T/over_sampling));
+clk_ideal=clk_ideal_gen(input_bits,over_sampling);
 
-time = (0:T/over_sampling:T*input_vector_length-(T/over_sampling));
-clk_ideal=clk_ideal_gen(input_vector_length,over_sampling);
-
-plot(time,clk_ideal)
+%plot(time,clk_ideal)
 
 
 input_data = randi([0 1], 100, 1);
@@ -37,9 +38,26 @@ clk_in = clk_gen(t_clk,start);
 %clk_tst=zeros(1,vector_length);
 data_out=zeros(1,vector_length);
 
+
+
+input_data = zeros(8,input_bytes);
+
+for j=1:size(input_data,2)
+    for i=1:size(input_data,1)
+        input_data(i,j) = randi([0 1], 1, 1);
+    end
+end
+
+
+
+
 %---------------------Driver----------------------------------------------%
 
-driv_data = driv_script(input_data);
+driv_data = driv_script(input_data,clk_ideal);
+
+vector_length=length(driv_data);
+
+plot(time,clk_ideal*300,time,driv_data)
 
 %---------------------Channel---------------------------------------------%
 
