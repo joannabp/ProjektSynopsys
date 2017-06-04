@@ -42,9 +42,9 @@ for i=2:length(clk)
 end
 
 
-alpha = 0.45;
+alpha = 0.2;
 driv_data = filter(alpha, [1 alpha-1], driv_data);
-        
+ 
 
 
 

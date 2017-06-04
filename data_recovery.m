@@ -1,19 +1,18 @@
-function [out_data, min_eye300_100, min_eye100_100, min_eye100_300, setup, hold]=data_recovery(input_vector, clk);
-global vector_length;
+function [out_data, min_eye300_100, min_eye100_100, min_eye100_300, setup, hold, eyeO1, eyeO2, eyeO3]=data_recovery(input_vector, clk);
+
 global min_eye_opening;
 global setup_t;
 global hold_t;
 global unres_val;
+vector_length=length(input_vector);
 %-------rising edge detection ------%
-thresh=0.1;
+thresh=0.5;
 ind= clk>thresh; %-----------rising edge vector
 ind=[0 diff(ind)>0]>0;
 
 t=1:length(clk);
 j=1;
 c=[];
-
-
 % ------------------- check setup time ------------% 
 
 s=1;
@@ -35,7 +34,6 @@ end
 % ------------------- check hold time ------------% ---- 
 
 h=1;
-
 prev_val=input_vector(1);
 hold(1)=1;
 for i=2:vector_length
@@ -82,7 +80,7 @@ for i=1:vector_length
     if(strcmp(unres_val, 'prev'))
         unres=prev_val;
     else
-         unres=-1;
+         unres=unres_val;
     end
 end 
 
