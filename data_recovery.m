@@ -1,74 +1,108 @@
-function [out_data, min_eye300_100, min_eye100_100, min_eye100_300, setup, hold, out]=data_recovery(input_vector, clk);
+function [out_data, min_eye300_100, min_eye100_100, min_eye100_300, setup, hold]=data_recovery(input_vector, clk);
 global vector_length;
-%global minimum_eye_opening;
-%global setup_t;
-%global hold_t;
-
+global min_eye_opening;
+global setup_t;
+global hold_t;
+global unres_val;
 %-------rising edge detection ------%
-%clk=[0 0 1 1 0 0 1 1 0 0 1 1 1 0 0 1 0 0 0 0 0 1 1 0 0 1 1 0 0 1 1 1 0 0 1 0 0 0 0 0 1 1 0 0 1 1 0 0 1 1 1 0 0 1 0 0 0 0 0 1 1 0 0 1 1 0 0 1 1 1 0 0 1 0 0 0 0 0 1 1 0 0 1 1 0 0 1 1 1 0 0 1 0 0 0 0 1 0 0 0 1];
-
-thresh=0.5;
+thresh=0.1;
 ind= clk>thresh; %-----------rising edge vector
 ind=[0 diff(ind)>0]>0;
 
 t=1:length(clk);
-
-%--------------
-%s1=randi(300,1, 50);
-%s2=(-1)*randi(300,1, 50);
-%s=horzcat(s1,s2);
-%out=[];
-%out_data=[];
 j=1;
+c=[];
 
 
-c200=[];
-c0=[];
-cm200=[];
+% ------------------- check setup time ------------% 
 
+s=1;
+prev_val=input_vector(1);
+setup(1)=1;
+for i=2:vector_length
+    c=(input_vector(i)-prev_val);
+    if (c<abs(1e-5))
+        setup(s)=setup(s)+1;
+    else 
+        setup(s)=1;
+    end
+    if(ind(i)==1)
+        s=s+1;
+        setup(s)=1;
+    end
+    prev_val=input_vector(i);
+end
+% ------------------- check hold time ------------% ---- 
+
+h=1;
+
+prev_val=input_vector(1);
+hold(1)=1;
+for i=2:vector_length
+    c=(input_vector(i)-prev_val);
+    if(ind(i)==1)
+        h=h+1;
+        hold(h)=1;
+        prev_val=input_vector(i);
+    end
+    if (c<abs(1e-5))
+        
+        hold(h)=hold(h)+1;
+    end
+end
+prev_val=0;
+k=1;
+%-------------------- compare level ----------------%
 for i=1:vector_length 
     if ind(i)==1
-        c200(j)=input_vector(i)>200;
-        c0(j)=input_vector(i)>0;
-        cm200(j)=input_vector(i)<-200;
+        %---------- sample 200 ---------------%
+            if(setup(j)<setup_t | hold(j)<hold_t)
+               c(k:k+1)=unres;
+            elseif(input_vector(i)>200+min_eye_opening/2)
+                c(k:k+1)=1;
+            elseif(input_vector(i)>200-min_eye_opening/2) 
+                 c(k:k+1)=unres;
+            elseif(input_vector(i)>min_eye_opening/2)
+                c(k)=1;
+                c(k+1)=0;
+            elseif(input_vector(i)>-min_eye_opening/2)
+                 c(k:k+1)=unres;
+            elseif(input_vector(i)>-200+min_eye_opening/2) 
+                c(k)=0;
+                c(k+1)=1;
+            elseif(input_vector(i)>-200-min_eye_opening/2)
+                  c(k:k+1)=unres;
+            else 
+               c(k:k+1)=0;
+            end   
+            prev_val=c(j);
              j=j+1;  
+             k=k+2;
+    end
+    if(strcmp(unres_val, 'prev'))
+        unres=prev_val;
+    else
+         unres=-1;
     end
 end 
 
-j=j-1;
-for i=1:j
-        if c200(i)==1
-            out(i)=3;
-        elseif c0(i)==1
-            out(i)=2;
-        elseif cm200(i)==0
-            out(i)=1;
-        else 
-            out(i)=0;
-        end
-end
 
-# out=out';
-# for i=1:2:j
-	# out=out';
-	# printf("converting %d \n",out(1,i));
-	# # printf(dec2bin(out(1,i),2));
-	# out_data=cellstr(dec2bin(out(1,i),2));
-# end
-out_data=cellstr(dec2bin(out,2))';
+out_data=c;
 
-m=1;
+j=1;
 e=[];
 for k=1:vector_length 
     if ind(k)==1
-    e(m)=input_vector(k);
-    m=m+1;
+        e(j)=input_vector(k);
+        j=j+1;
     end
 end 
-m=m-1;
+
+
+j=j-1;
 c=1;
-eye=zeros(m-1, 3);
-for k=1:m-2
+eye=zeros(j-1, 3);
+for k=1:j-2
     eye(k,:)=e(c:c+2);
     c=c+1;
 end
@@ -79,9 +113,9 @@ b=1;
 eyeO1=[];
 eyeO2=[];
 eyeO3=[];
-%%eye01=zeros(1);
 
-for k=1:m-2
+%----------------save eye opening values -----------%
+for k=1:j-2
     
     if(eye(k,2)>=-300 && eye(k,2)<=-100)
         eyeO1(a)=eye(k,2);
@@ -107,10 +141,3 @@ eyeO3_sort=sort(eyeO3);
 min_eye300_100=max(diff(eyeO1_sort));
 min_eye100_100=max(diff(eyeO2_sort));
 min_eye100_300=max(diff(eyeO3_sort));
-data=out_data;
-setup=1;
-hold=1;
-% 3 cykle zegara zestawiæ ze sob¹ 
-% t is here that we introduce SETUP and HOLD time. Setup time is defined as the minimum amount of time before the clock's active edge that the data must be stable for it to be latched correctly. Any violation may cause incorrect data to be captured, which is known as setup violation.
-% 
-% Hold time is defined as the minimum amount of time after the clock's active edge during which data must be stable. Violation in this case may cause incorrect data to be latched, which is known as a hold violation. Note that setup and hold time is measured with respect to the active clock edge only.
