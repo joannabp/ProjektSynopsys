@@ -1,38 +1,53 @@
-function dr=driv_script(input_num);
-%input_num=randi([0 1], 100, 1);
-j=1;
-pam4_vect=zeros(1,50);
-for i=1:2:99
-    i;
-    pam4_vect(1,j)=str2num(strcat(num2str(input_num(i)),num2str(input_num(i+1))));
-    j=j+1;
-end 
+function driv_data=driv_script2(input_data,clk);
 
- %pam4_vect=bi2de(pam4_vect(i);
-j=1;
-for i=1:50
-        if pam4_vect(1,i)==0
-            
-            out(j:j+31)=-300;
-           
-            j=j+32;
-        elseif  pam4_vect(1,i)==1
-            out(j:j+31)=-100;
-            j=j+32;
-        elseif  pam4_vect(1,i)==10
+pam4 = zeros(1,size(input_data,2)*size(input_data,1)/2);
 
-            out(j:j+31)=100;
-            j=j+32;
-        else 
-
-            out(j:j+31)=300;
-            j=j+32;
+for j=0:size(input_data,2)-1
+    for i=0:size(input_data,1)/2-1 %%%%%%%%%%%%%%%%%
+        if input_data(2*i+1,j+1) == 1
+            if input_data(2*i+2,j+1) == 1
+                pam4(j*(size(input_data,1)/2)+i+1) = 300;
+            else  
+                pam4(j*(size(input_data,1)/2)+i+1) = 100;
+            end
+        else
+            if input_data(2*i+2,j+1) == 1
+                pam4(j*(size(input_data,1)/2)+i+1) = -100;
+            else
+                pam4(j*(size(input_data,1)/2)+i+1) = -300;
+            end
         end
+    end
 end
 
-%plot(1:1600,out);
+
+trigger = 0;
+k=0;
+rand = randi([0 3], 1, 1);
+
+for i=2:length(clk)
+    if clk(i)-clk(i-1)==1
+        trigger = 1;
+        k = k + 1;
+        if k > length(pam4)
+            break
+        end
+    end
+    if trigger == 0
+        driv_data(1) = -300 + rand * 200;
+        driv_data(i) = -300 + rand * 200;
+    else 
+        driv_data(i) = pam4(k);
+    end
+end
+
+
 alpha = 0.45;
-exponentialMA_data = filter(alpha, [1 alpha-1], out);
-figure
-plot(1:1600, exponentialMA_data);
-dr=exponentialMA_data;
+driv_data = filter(alpha, [1 alpha-1], driv_data);
+        
+
+
+
+
+end
+   
