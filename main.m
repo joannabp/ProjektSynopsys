@@ -1,69 +1,125 @@
+
 clear all;
 close all;
 clc
+
 global vector_length;
 global setup_t;
 global hold_t;
 global min_eye_opening;
 global unres_val;
+global over_sampling;
+global T;
 
-unres_val='x';
-setup_t=3;
-hold_t=1;
-vector_length=1600;
-min_eye_opening=10;
-input_data = randi([0 1], 100, 1);
-t_clk=randi(64,1,1)+1;
-start=randi(30,1,1);
+unres_val=-1; % -1/ 'prev'
 
-clk = clk_gen(t_clk,start);
-start=30;
+min_eye_opening=10; %[mV]
+vector_length=2000;
 
-%---------------------driver----------------------------------------------%
 
-driv_data = driv_script(input_data);
+dlugosc_kanalu = 10;
+input_bytes=200;   % number of imput bytes
 
-%eyediagram(driv_data,2,2);
+input_bits=input_bytes*8;
+over_sampling = 50;
+freq = 10^10;     % 10GHz
+T = 1/freq;       % 0.1ns
+   % number of imput bits
+time = (0:T/over_sampling:T*input_bits-(T/over_sampling));
+clk_ideal=clk_ideal_gen(input_bits,over_sampling);
+setup_t=4*T; % *2ns
+hold_t=4*T; % *2ns
+% figure
+% plot(time,clk_ideal)
+
+t_clk=31;
+start=31;
+clk_in = clk_gen(t_clk,start);
+%clk_tst=zeros(1,vector_length);
+
+
+
+input_data = zeros(8,input_bytes);
+
+for j=1:size(input_data,2)
+    for i=1:size(input_data,1)
+        input_data(i,j) = randi([0 1], 1, 1);
+    end
+end
+
+%---------------------Driver----------------------------------------------%
+
+driv_data = driv_script(input_data,clk_ideal);
+
+vector_length=length(driv_data);
+
 %---------------------Channel---------------------------------------------%
 
-channel_data =driv_data;
-%channel_data =channel_function(100, driv_data);
-%szum=szum(driv_data,0.5);
+
+channel_data1 = channel(driv_data);
+channel_data = channel(channel_data1);
+%channel_data = channel(channel_data2);
+%# for i=2:vector_length
+%	# if(abs(driv_data(i)-driv_data(i-1))>=100)
+%		# clk_tst(i)=1;
+%	# end
+%# end
 
 %---------------------Clock_Recovery--------------------------------------%
 
-clk_out=clock_recovery(clk,t_clk);
+clk_out=clock_recovery(clk_in,t_clk);
 
 %---------------------Data_Recovery---------------------------------------%
 
-[data, min_eye300_100, min_eye100_100, min_eye100_300, setup, holdd] = data_recovery(driv_data, clk_out);
+clk_zero=[];
+clk_zero(1:75)=0;
+clk_ideal=[clk_zero clk_ideal];
 
-% nums_str=[data{:}];
-% nums_split=[];
-% 
-% for i=1:length(nums_str)
-%     if(nums_split(i)~=unres_val)
-%         nums_split(i)=str2num(nums_str(i));
-%     else
-%         nums_split(i)=unres_val;
-% end
-% nums_split=nums_split';
-% error=[];
-% for i=1:50
-%     if nums_split(i)~=input_data(i) 
-%      %   printf('error w %d',i);
-%      error(i)=1;
-%     else
-%         error(i)=0;
-%     end
-% end
-%---------------------Dodatki---------------------------------------------%
+[data, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3] = data_recovery(channel_data, clk_ideal,T);     
 
-%plot(driv_data);
-%ylabel('data in');
-% figure
-% plot(clk(1:66));
-% ylabel('clk wzor');
-% figure
-% plot(clk_out(1:66));
-% ylabel('clk out');
+error=0;
+k=1;
+c=1;
+data_b=[,];
+for i=1:8:input_bits-8
+    data_b(:,k )=data(i:i+7);
+    if~(isequal(data_b(:,k ), input_data(:, k)))
+       % error=error+1;
+    end  
+    data_c(c:c+7)=input_data(:, k);
+    c=c+8;
+    k=k+1;
+end
+
+
+
+for i=1:input_bits-8
+    if~(data_c(i)==data(i))
+        error=error+1;
+    end
+end
+% %---------------------Dodatki---------------------------------------------%
+
+figure
+plot(time, driv_data, time, channel_data, time, clk_ideal(1:80000)*50);
+ylabel('data driver, channel, clock');
+figure
+for i=1:length(driv_data)/over_sampling/3
+    plot(-over_sampling:over_sampling-1, driv_data(over_sampling/2+1+3*over_sampling*(i-1):3*over_sampling*(i) -over_sampling/2));
+    hold on
+end
+
+
+figure
+for i=1:length(channel_data)/over_sampling/3
+    plot(-over_sampling:over_sampling-1, channel_data(over_sampling/2+1+3*over_sampling*(i-1):3*over_sampling*(i) -over_sampling/2)) ;
+    hold on
+end
+
+
+
+figure
+plot(data)
+ylabel(' data recovered');
+% setup=setup';
+% holdd=holdd';

@@ -1,51 +1,35 @@
 function clk_out=clock_recovery(clk_in,t_clk)
 global vector_length;
-clk_out=zeros(1,vector_length);
-t_vco=31;																					%docelowy okres zegara wyjsciowego
-start=0;  
-start_out=31; 																		%docelowe miejsce pierwszego zbocza narastajacego zegara
+t_vco_start=20;																		%okres sygnalu wyjsciowego vco przy zerowym napieciu detektora fazy
+start_out=14; 																		
+clk_out=clk_gen_id(t_vco_start,start_out);
 k_df=10; 																					%wspolczynnik napiecia detektora fazy
 v_df=0; 																					%napiecie wyjsciowe detektora fazy
 start=slope(clk_in); 															%wykrywanie pierwszego zbocza zegara wejsciowego
-# for i=2:N
-		# if(clk_in(i)>clk_in(i-1))
-			# start_in=i;
-			# printf('start zegara wej. w %d\n',i);
-			# break;
-		# end
-# end
-%clk_out=clk_in;
+t_vco=t_vco_start;
 v_df=k_df*abs(start_out-start); 									%obliczenie poczatkowego napiecia detektora fazy
 while(v_df>0||t_clk~=t_vco) 											%petla wykonywana do osiagniecia zgodnosci faz i czestotliwosci zegarów
-	if(t_vco~=t_clk)
+
 		if(t_vco>t_clk)
-			t_clk=t_clk+1; 															%zwiekszany okres
-		elseif(t_vco<t_clk)			
-			t_clk=t_clk-1;															%zmniejszany okres
-		end
-	end
-	
-	# for i=1:start																	
-		# clk_out(i)=0;
-	# end
-	clk_out=clk_gen(t_clk,start);										%generacja zegara z nowym opóznieniem startowym i okresem
-	# for i=start_in+1:vector_length								
-		# if(mod(i-start_in,t_clk)<floor(t_clk/2)) 
-        # clk_out(i)=1; 																
-		# else
-        # clk_out(i)=0; 														
-		# end
-	# end
+			t_vco=t_vco-1; 			
+     % printf("zmniejszany okres, t_vco = %d \n",t_vco);      
+    elseif(t_vco<t_clk)	
+			t_vco=t_vco+1; 	
+    %  printf("zwiekszamy okres, t_vco = %d \n",t_vco);     																	    
+    end
+
+	clk_out=clk_gen_id(t_vco,start_out);										%generacja zegara z nowym opóznieniem startowym i okresem
 	
 	if(start~=start_out)
-		start=slope(clk_out);													%znajdowanie pierwszego zbocza zegara
-		# for i=2:N
-			# if(clk_out(i)>clk_out(i-1))
-				# start_in=i;
-				# %detekcja pierwszego zbocza zegara
-				# break;
-			# end
-		# end
+		start_out=slope(clk_out);													%znajdowanie pierwszego zbocza zegara
 	end
-	v_df=k_df*abs(start_out-start);							%obliczanie nowego napiecia detektora fazy
+	v_df=k_df*abs(start_out-start);							    %obliczanie nowego napiecia detektora fazy
 end
+%figure
+%plot(1:1600,clk_in,1:1600,clk_out);
+%ylabel('clk');
+%plot(clk_in(1:66));
+%ylabel('clk in');
+%figure
+%plot(clk_out(1:66));
+%ylabel('clk out');
