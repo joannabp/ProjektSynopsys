@@ -5,6 +5,7 @@ global setup_t;
 global hold_t;
 global T;
 global unres_val;
+global over_sampling;
 
 
 vector_length=length(input_vector);
@@ -144,23 +145,23 @@ end
 
 
 
-setup_200=setup_200*T;
-setup0=setup0*T;
-setup200=setup200*T;
+setup_200=setup_200*T/over_sampling;
+setup0=setup0*T/over_sampling;
+setup200=setup200*T/over_sampling;
 
 setup_200=setup_200-setup_t;
 setup0=setup0-setup_t;
 setup200=setup200-setup_t;
 
-hold_200=hold_200-hold_t;
-hold0=hold0*T-hold_t;
-hold200=hold200*T-hold_t;
+hold_200=hold_200*T/over_sampling-hold_t;
+hold0=hold0*T/over_sampling-hold_t;
+hold200=hold200*T/over_sampling-hold_t;
 k=1;
 
 for i=1:j 
     
      if(setup200(i)<0 || hold200(i)<0 || setup0(i)<0 || hold0(i)<0 || setup_200(i)<0 || hold_200(i)<0)
-          %data(k:k+1)=unres;
+          data(k:k+1)=unres;
           
      end
      k=k+2;

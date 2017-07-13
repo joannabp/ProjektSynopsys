@@ -1,4 +1,4 @@
-function [data, th_200, th0, th200]=sample_and_decode_data(input_vector, rising_edge_detector, clk);
+function [data, th_200, th0, th200, slope_sampled]=sample_and_decode_data(input_vector, rising_edge_detector, rising_edge_detector_shf, clk);
 thresh=0.5;
 global min_eye_opening;
 global setup_t;
@@ -69,32 +69,16 @@ th200(1)=200;
 for i=1:vector_length 
     
 
-% % ------------------- check setup -200 time ------------% ---- 
-% 
-%    
-%     if (abs(input_vector(i)-th_200(j))>min_eye_opening/2)
-%         setup_200(s_200)=setup_200(s_200)+1;
-%     else 
-%         setup_200(s_200)=1;
-%     end
-% % ------------------- check setup 0 time ------------% ---- 
-% 
-%    
-%     if (abs(input_vector(i)-th0(j))>min_eye_opening/2)
-%         setup0(s0)=setup(s0)+1;
-%     else 
-%         setup0(s0)=1;
-%     end
-% % ------------------- check setup -200 time ------------% ----
-% 
-%    
-%     if (abs(input_vector(i)-th200(j))>min_eye_opening/2)
-%         setup200(s200)=setup(s200)+1;
-%     else 
-%         setup200(s200)=1;
-%     end
-% 
-    
+% % ------------------- slope sampler------------% ---- 
+
+if rising_edge_detector_shf(i)==1
+    if input_vector(i)>0
+        slope_sampled(j)=1;
+    else
+        slope_sampled(j)=0;
+    end
+end
+
  %------------------- compare -----------------------%
     
     if rising_edge_detector(i)==1
@@ -198,11 +182,11 @@ for i=1:length(input_vector)/50
     th200plot((i-1)*50+1:i*50)=th200(i);
     
 end
-figure 
-plot(input_vector, 'color',[1 0 1]);
-hold on
-plot(th_200plot(1:length(input_vector)), 'color',[1 0 0]);
-plot(th0plot(1:length(input_vector)), 'color',[0 1 0]);
-plot(th200plot(1:length(input_vector)), 'color',[0 0 0]);
-hold off
+% figure 
+% plot(input_vector, 'color',[1 0 1]);
+% hold on
+% plot(th_200plot(1:length(input_vector)), 'color',[1 0 0]);
+% plot(th0plot(1:length(input_vector)), 'color',[0 1 0]);
+% plot(th200plot(1:length(input_vector)), 'color',[0 0 0]);
+% hold off
 

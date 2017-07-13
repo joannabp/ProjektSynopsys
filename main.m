@@ -1,8 +1,9 @@
 
+
 clear all;
 close all;
 clc
-
+ tic
 global vector_length;
 global setup_t;
 global hold_t;
@@ -18,7 +19,7 @@ vector_length=2000;
 
 
 dlugosc_kanalu = 10;
-input_bytes=200;   % number of imput bytes
+input_bytes=100000;   % number of imput bytes
 
 input_bits=input_bytes*8;
 over_sampling = 50;
@@ -27,8 +28,8 @@ T = 1/freq;       % 0.1ns
    % number of imput bits
 time = (0:T/over_sampling:T*input_bits-(T/over_sampling));
 clk_ideal=clk_ideal_gen(input_bits,over_sampling);
-setup_t=4*T; % *2ns
-hold_t=4*T; % *2ns
+setup_t=2*T/over_sampling; % *2ns
+hold_t=2*T/over_sampling; % *2ns
 % figure
 % plot(time,clk_ideal)
 
@@ -57,8 +58,8 @@ vector_length=length(driv_data);
 
 
 channel_data1 = channel(driv_data);
-channel_data = channel(channel_data1);
-%channel_data = channel(channel_data2);
+channel_data2 = channel(channel_data1);
+channel_data = channel(channel_data2);
 %# for i=2:vector_length
 %	# if(abs(driv_data(i)-driv_data(i-1))>=100)
 %		# clk_tst(i)=1;
@@ -72,10 +73,10 @@ clk_out=clock_recovery(clk_in,t_clk);
 %---------------------Data_Recovery---------------------------------------%
 
 clk_zero=[];
-clk_zero(1:75)=0;
+clk_zero(1:99)=0;
 clk_ideal=[clk_zero clk_ideal];
 
-[data, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3] = data_recovery(channel_data, clk_ideal,T);     
+[data, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3] = data_recovery(channel_data, clk_ideal,clk_ideal,T);% clk_shf,T);     
 
 error=0;
 k=1;
@@ -112,7 +113,7 @@ end
 
 figure
 for i=1:length(channel_data)/over_sampling/3
-    plot(-over_sampling:over_sampling-1, channel_data(over_sampling/2+1+3*over_sampling*(i-1):3*over_sampling*(i) -over_sampling/2)) ;
+    plot(-over_sampling:over_sampling-1, channel_data(over_sampling+1+3*over_sampling*(i-1):3*over_sampling*(i) )) ;
     hold on
 end
 
@@ -123,3 +124,4 @@ plot(data)
 ylabel(' data recovered');
 % setup=setup';
 % holdd=holdd';
+toc;
