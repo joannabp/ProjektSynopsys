@@ -2,7 +2,7 @@ function channel_data = channel(driv_data);
 global vector_length;
 
 format long
-d=7;
+d=9;
 Cp=34.06e-12;
 Rp=36.2e-3;
 Lp=5.06e-12;
@@ -84,7 +84,7 @@ w = 1 / (RC);
 % Prewarped coefficient for Bilinear transform
 a = exp(-2e-12/(RC))
 
-b=[1-a]
+b=[0 1-a]
 a=[1 -a]
 
     

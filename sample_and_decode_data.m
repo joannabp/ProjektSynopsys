@@ -12,22 +12,11 @@ j=1;
 data=[];
 sampled=[];
 
-lvl1=1;
-lvl2=37;
-lvl3=124;
+%wartości z odpowiedzi impulsowej
+lvl1=0;
+lvl2=-6;
+lvl3=73;
 
-% lvl1=1;
-% lvl2=14;
-% lvl3=172;
-% unres=unres_val;
-% 
-% s_200=1;
-% s0=1;
-% s200=1;
-% 
-% h_200=1;
-% h0=1;
-% h200=1;
 
 prev_val=input_vector(1);
 setup(1)=1;
@@ -49,21 +38,6 @@ th_200(1)=-200;
 th0(1)=0;
 th200(1)=200;
 
-% setup_200=zeros(1,50000);
-% setup0=zeros(1,50000);
-% setup200=zeros(1,50000);
-% 
-% setup_200(1)=1;
-% setup0(1)=1;
-% setup200(1)=1;
-% 
-% hold_200=zeros(1,50000);
-% hold0=zeros(1,50000);
-% hold200=zeros(1,50000);
-% 
-% hold_200(1)=1;
-% hold0(1)=1;
-% hold200(1)=1;
 
 %-------------------- compare----------------%
 for i=1:vector_length 
@@ -82,21 +56,7 @@ end
  %------------------- compare -----------------------%
     
     if rising_edge_detector(i)==1
-         %setup(s-1)=setup(s-1)-clk(i)-thresh-clk(i-1);
-%          s_200=s_200+1;
-%         setup_200(s_200)=1;
-%          s200=s200+1;
-%         setup200(s200)=1;
-%         s0=s0+1;
-%         setup0(s0)=1;
-%         
-%         h_200=h_200+1;
-%         hold_200(h_200)=0.5;
-%         h0=h0+1;
-%         hold0(h0)=0.5;
-%         h200=h200+1;
-%         hold200(h200)=0.5;
-        
+
 %-------------------- set threshold ----------------%
         th0(j)=scaled_th_dat(j)*lvl1+scaled_th_dat(j+1)*lvl2;
         th_200(j)=th0(j)-lvl3;
@@ -174,19 +134,19 @@ end
 
 end 
 
-
-
-for i=1:length(input_vector)/50
-    th_200plot((i-1)*50+1:i*50)=th_200(i);
-    th0plot((i-1)*50+1:i*50)=th0(i);
-    th200plot((i-1)*50+1:i*50)=th200(i);
-    
-end
-% figure 
-% plot(input_vector, 'color',[1 0 1]);
-% hold on
-% plot(th_200plot(1:length(input_vector)), 'color',[1 0 0]);
-% plot(th0plot(1:length(input_vector)), 'color',[0 1 0]);
-% plot(th200plot(1:length(input_vector)), 'color',[0 0 0]);
-% hold off
-
+% 
+% 
+% for i=1:length(input_vector)/50
+%     th_200plot((i-1)*50+1:i*50)=th_200(i);
+%     th0plot((i-1)*50+1:i*50)=th0(i);
+%     th200plot((i-1)*50+1:i*50)=th200(i);
+%     
+% end
+% % figure 
+% % plot(input_vector, 'color',[1 0 1]);
+% % hold on
+% % plot(th_200plot(1:length(input_vector)), 'color',[1 0 0]);
+% % plot(th0plot(1:length(input_vector)), 'color',[0 1 0]);
+% % plot(th200plot(1:length(input_vector)), 'color',[0 0 0]);
+% % hold off
+% 

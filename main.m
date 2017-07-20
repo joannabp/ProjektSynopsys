@@ -19,7 +19,7 @@ vector_length=2000;
 
 
 dlugosc_kanalu = 10;
-input_bytes=100000;   % number of imput bytes
+input_bytes=300;   % number of imput bytes
 
 input_bits=input_bytes*8;
 over_sampling = 50;
@@ -30,6 +30,7 @@ time = (0:T/over_sampling:T*input_bits-(T/over_sampling));
 clk_ideal=clk_ideal_gen(input_bits,over_sampling);
 setup_t=2*T/over_sampling; % *2ns
 hold_t=2*T/over_sampling; % *2ns
+
 % figure
 % plot(time,clk_ideal)
 
@@ -57,9 +58,19 @@ vector_length=length(driv_data);
 %---------------------Channel---------------------------------------------%
 
 
-channel_data1 = channel(driv_data);
-channel_data2 = channel(channel_data1);
-channel_data = channel(channel_data2);
+channel_data = channel(driv_data);
+ eq_dat=ctle(channel_data, 5e8, 6e9, 12e9, 13, -10); % (signal, fz, fp1, fp2, HFboost, DCgain)
+ 
+%  t0=[212,210,208,206,204,202,200,198,196,194,192,190];
+% f0=zeros(1,12);
+% for i=1:12
+%     f0(i)=200/t0(i)*freq;
+% end
+% 
+% clk=clk_gen_f_not_id3(freq,0,length(driv_data),0,t0,f0,input_bits)
+
+% channel_data2 = channel(channel_data1);
+% channel_data = channel(channel_data2);
 %# for i=2:vector_length
 %	# if(abs(driv_data(i)-driv_data(i-1))>=100)
 %		# clk_tst(i)=1;
@@ -72,11 +83,12 @@ clk_out=clock_recovery(clk_in,t_clk);
 
 %---------------------Data_Recovery---------------------------------------%
 
-clk_zero=[];
-clk_zero(1:99)=0;
+% clk_zero=[];
+clk_zero(1:50)=0;
 clk_ideal=[clk_zero clk_ideal];
 
-[data, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3] = data_recovery(channel_data, clk_ideal,clk_ideal,T);% clk_shf,T);     
+[data, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf] = data_recovery(eq_dat, clk_ideal,clk_ideal);% clk_shf);     
+
 
 error=0;
 k=1;
@@ -100,10 +112,10 @@ for i=1:input_bits-8
     end
 end
 % %---------------------Dodatki---------------------------------------------%
-
-figure
-plot(time, driv_data, time, channel_data, time, clk_ideal(1:80000)*50);
-ylabel('data driver, channel, clock');
+% 
+% figure
+% plot(time, driv_data, time, channel_data, time, clk_ideal);
+% ylabel('data driver, channel, clock');
 figure
 for i=1:length(driv_data)/over_sampling/3
     plot(-over_sampling:over_sampling-1, driv_data(over_sampling/2+1+3*over_sampling*(i-1):3*over_sampling*(i) -over_sampling/2));
@@ -117,7 +129,11 @@ for i=1:length(channel_data)/over_sampling/3
     hold on
 end
 
-
+figure
+for i=1:length(eq_dat)/over_sampling/3
+    plot(-over_sampling:over_sampling-1, eq_dat(over_sampling+1+3*over_sampling*(i-1):3*over_sampling*(i) )) ;
+    hold on
+end
 
 figure
 plot(data)

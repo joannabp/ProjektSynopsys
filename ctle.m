@@ -1,6 +1,7 @@
 %channel
-close all
-clear all
+
+function eq_data=ctle(input_vector, fz, fp1, fp2, HFboost, DCgain);
+
 
 d=15;
 Cp=34.06e-12;
@@ -23,22 +24,28 @@ w = logspace(0,13, 500);
 Hch = 1./ (1 + j*w*R*C); 
 
 
-fz=5e8;
-fp1=1.5e9;
-fp2=6e9;
-wz=fz*pi*2;
-wp1=fp1*pi*2;
-wp2=fp2*pi*2;
+% fz=5e8;
+% fp1=1.5e9;
+% fp2=6e9;
+ wz=fz*pi*2;
+ wp1=fp1*pi*2;
+ wp2=fp2*pi*2;
 
-b=[1 wz];
-a0=[1 wp1];
-a1=[1 wp2];
-a=conv(a0, a1);
+if(HFboost==0)
+   
+    
+    HFboost=20*log10(wp1/wz);
+    
 
-DCg=-3;
-wp1=(DCg/2)*wz;
-HFb=wp1/wz;
-gmCp=wp2*10^(DCg/20)*HFb;
+    
+else
+    wz=wp1/(10^(HFboost/20));
+    
+end
+
+
+
+gmCp=wp2*10^(DCgain/20)*(10^(HFboost/20));
 Hct =gmCp* (j*w +wz)./((j*w +wp1).*(j*w +wp2));
 
 figure
@@ -55,5 +62,25 @@ ylabel('Magnitude (dB)')
 semilogx(w/(2*pi),(20*log10(abs(Hch)) +20*log10(abs(Hct))))
 
 
-hold off
+T=2e-12;
+% Tfa=2/T;
+
+% b=[Tfa+wz 2*wz wz-Tfa];
+% a=[(Tfa^2+Tfa*(wp1-wp2)+wp1*wp2) (-2*Tfa^2+2*wp1*wp2) (Tfa^2-Tfa*(wp1+wp2)+wp1*wp2)];
+% 
+% b=gmCp*b/a(1);
+% a=a/a(1);
+
+b=gmCp*[0 1/T wz-1/T];
+
+a0=[1/T wp1-1/T];
+a1=[1/T wp2-1/T];
+a=conv(a0, a1);
+b=b/a(1);
+a=a/a(1);
+eq_data=filter(b,a, input_vector);
+
+
+
+
 
