@@ -13,6 +13,7 @@ for i=1:stop-start
         clk(i)=clk1;
     elseif(mod(i,t_clk)==t_clk/2+1)
         clk(i)=thr+clk1;
+        fprintf('zbocze w %d\n',i+start);
 %abs(0.2*randn);
 % for i=3:stop-start
 %       if(mod(i,t_clk)==floor(t_clk/2)-1)
