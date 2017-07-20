@@ -1,0 +1,11 @@
+str 27 transformata kanału:
+https://www.vutbr.cz/www_base/zav_prace_soubor_verejne.php?file_id=138662
+
+przejście z dziedziny s na z:
+http://scilab.ninja/study-modules/scilab-control-engineering-basics/module-7-continuous-to-discrete-conversion-methods/
+
+najlepiej użyć Forward difference, jako T póki co użyj chyba 2e-12
+
+- -------
+ogólnie chodzi o to, żeby ten kanał miał powiązaną charakterystykę z rzeczywistą długością najelpiej(ale to możesz zostawić na później).
+Najważniejsze, to żeby miał jakieś dodatkowe zera czy bieguny,a nie taką idealną charakterystykę. Może jak przeniesiesz transformatę tego modelu, który wysłałam wcześniej, z cewkami itd, na dziedzinę z, to coś fajnego wyjdzie, może póki co wystarczy. :)
