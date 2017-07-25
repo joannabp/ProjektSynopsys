@@ -57,17 +57,17 @@ h_200=1;
 h0=1;
 h200=1;
 
-setup_200=zeros(1,50000);
-setup0=zeros(1,50000);
-setup200=zeros(1,50000);
+%setup_200=zeros(1,50000);
+%setup0=zeros(1,50000);
+%setup200=zeros(1,50000);
 
 setup_200(1)=1;
 setup0(1)=1;
 setup200(1)=1;
 
-hold_200=zeros(1,50000);
-hold0=zeros(1,50000);
-hold200=zeros(1,50000);
+%hold_200=zeros(1,50000);
+%hold0=zeros(1,50000);
+%hold200=zeros(1,50000);
 
 hold_200(1)=1;
 hold0(1)=1;
@@ -161,7 +161,7 @@ k=1;
 for i=1:j 
     
      if(setup200(i)<0 || hold200(i)<0 || setup0(i)<0 || hold0(i)<0 || setup_200(i)<0 || hold_200(i)<0)
-          data(k:k+1)=unres;
+         data(k:k+1)=unres;
           
      end
      k=k+2;

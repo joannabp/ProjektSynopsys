@@ -1,18 +1,25 @@
-%function eq_data = ctle(input_vector);
+function eq_data = ctle_back(input_vector);
 
-
+format long
 fz=5e9;
 fp1=8e10;
 fp2=12e10;
 wz=fz*3.14*2;
 wp1=fp1*3.14*2;
 wp2=fp2*3.14*2;
+a0=[1-wp1 -1];
+a1=[1-wp2 -1];
+a=conv(a0,a1);
+b=(4e10)*[(1-wz) 1]/a(1);
+a=a/a(1);
 
-b=[1 wz];
-a0=[1 wp1];
-a1=[1 wp2];
-
-
+% b=[1 wz];
+% a0=[1 wp1];
+% a1=[1 wp2];
+% 
+% a=wp1;
+% b=wp2;
+% w=wz;
 
 % b = [1 2*3.14*fz];
 %  a0 = [1 2*3.14*fp1];
@@ -29,20 +36,21 @@ a1=[1 wp2];
 % b=[1 -1];
 % a=[1 -1/exp(R/L)];
 %  
-% %  b0=a*exp(b)*(b-w)+w*exp(b)*(a-b)+b*exp(a)*(w-a);
-% % b1=a*exp(b)*(w-b)+w*(b-a)+b*exp(a)*(a-w);
+% b0=(4e10)*(a*exp(b)*(b-w));
+%  b0=w*exp(b)*(a-b)+b*exp(a)*(w-a);
+%  b1=(4e10)*(a*exp(b)*(w-b)+w*(b-a)+b*exp(a)*(a-w));
 % % 
 % % 
-% % a0=a^2*b*exp(b)-b^2*a*exp(b);
-% % a1=a^2*b+b^2*a;
+% a0=a^2*b*exp(b)-b^2*a*exp(b);
+%  a1=a^2*b+b^2*a;
 % % 
 % % 
-% % a1=a1/a0;
-% % b0=b0/a0;
-% % b1=b1/a0;
-% % ac=[1 a1];
-% % bc=[b0 b1];
-%  eq_data =filter(b, a, input_vector);
+%  a1=a1/a0;
+%  b0=b0/a0;
+%  b1=b1/a0;
+% ac=[1 a1];
+%  bc=(4e10)*[b0 b1];
+  eq_data =filter(b, a, input_vector);
 % %  w = logspace(0,20,32);
 % %  
 % %  

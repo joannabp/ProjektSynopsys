@@ -1,4 +1,4 @@
-function [data, th_200, th0, th200, slope_sampled]=sample_and_decode_data(input_vector, rising_edge_detector, rising_edge_detector_shf, clk);
+function [data, th_200, th0, th200, slope_sampled, wf]=sample_and_decode_data(input_vector, rising_edge_detector, rising_edge_detector_shf, clk, wf);
 thresh=0.5;
 global min_eye_opening;
 global setup_t;
@@ -13,10 +13,15 @@ data=[];
 sampled=[];
 
 %wartości z odpowiedzi impulsowej
-lvl1=0;
-lvl2=-6;
-lvl3=73;
+lvl1=-1.53;
+lvl2=-0.58;
+lvl3=66;
 
+miu=0.001;%step
+size_feed=3;
+%wf=[0; 0; 0];
+sample = zeros(1, size_feed);
+e=[]; 
 
 prev_val=input_vector(1);
 setup(1)=1;
@@ -25,6 +30,7 @@ for i=1:vector_length
     sampled(i)=0;
     if rising_edge_detector(i)==1
         sampled(i)= (input_vector(i)+(input_vector(i)-input_vector(i-1))*abs(clk(i)-thresh-clk(i-1)));
+        
     end
 end
 scaled_th_dat=[];
@@ -58,7 +64,8 @@ end
     if rising_edge_detector(i)==1
 
 %-------------------- set threshold ----------------%
-        th0(j)=scaled_th_dat(j)*lvl1+scaled_th_dat(j+1)*lvl2;
+      th0(j)=scaled_th_dat(j)*lvl1+scaled_th_dat(j+1)*lvl2;
+       %th0(j)=scaled_th_dat(j)*wf(1)+scaled_th_dat(j+1)*wf(2);
         th_200(j)=th0(j)-lvl3;
         th200(j)=th0(j)+lvl3;
     
@@ -120,6 +127,28 @@ end
              scaled_th_dat(j+2)=-1.5;
         end
              
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            x(j)=sample*wf;
+        w(j)=sampled(i)-x(j);
+        if(sig0(j)==0)
+            z(j)=-1;
+        else
+            z(j)=1;
+        end
+        e(j)= w(j)-z(j)*100;
+        wf=wf+miu*e(j)*sample';
+        wff1(j)=wf(1);
+        wff2(j)=wf(2);
+        sample = [ z(j) sample(1:end-1)];
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        %%adapt_ctle
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         k=k+2;
         prev_val=data(j);
         j=j+1;  
@@ -150,3 +179,10 @@ end
 % % plot(th200plot(1:length(input_vector)), 'color',[0 0 0]);
 % % hold off
 % 
+
+% figure
+% hold on
+% plot(wff1);
+% plot(wff2);
+% hold off
+
