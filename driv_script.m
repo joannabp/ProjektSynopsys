@@ -58,7 +58,7 @@ while k<numel(pam4)
 end
 
 
-
+driv_data=driv_data(1:i);
 
 
 alpha = 0.2;

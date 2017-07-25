@@ -1,27 +1,29 @@
-function [data, th_200, th0, th200, slope_sampled, wf]=sample_and_decode_data(input_vector, rising_edge_detector, rising_edge_detector_shf, clk, wf);
+function [data, th_200, th0, th200, slope_sampled, wf, scaled_th_dat]=sample_and_decode_data(input_vector, rising_edge_detector, rising_edge_detector_shf, clk, wf, scaled_th_dat);
 thresh=0.5;
 global min_eye_opening;
 global setup_t;
 global hold_t;
 global unres_val;
+global sample;
 vector_length=length(input_vector);
 
 prev_val=0;
 k=1;
 j=1;
-data=[];
-sampled=[];
+data=zeros(1,2);
+sampled=zeros(1,10);
+
 
 %wartości z odpowiedzi impulsowej
 lvl1=-1.53;
 lvl2=-0.58;
 lvl3=66;
 
-miu=0.001;%step
-size_feed=3;
+miu=0.0005;%step
+%size_feed=3;
 %wf=[0; 0; 0];
-sample = zeros(1, size_feed);
-e=[]; 
+
+e=zeros(1,10); 
 
 prev_val=input_vector(1);
 setup(1)=1;
@@ -33,8 +35,8 @@ for i=1:vector_length
         
     end
 end
-scaled_th_dat=[];
-scaled_th_dat(1:2)=[-1.5 -1.5];
+%scaled_th_dat=[];
+%scaled_th_dat(1:2)=[-1.5 -1.5];
 
 th_200=zeros(1,50000);
 th0=zeros(1,50000);
@@ -53,9 +55,9 @@ for i=1:vector_length
 
 if rising_edge_detector_shf(i)==1
     if input_vector(i)>0
-        slope_sampled(j)=1;
+        slope_sampled=1;
     else
-        slope_sampled(j)=0;
+        slope_sampled=0;
     end
 end
 
@@ -64,8 +66,8 @@ end
     if rising_edge_detector(i)==1
 
 %-------------------- set threshold ----------------%
-      th0(j)=scaled_th_dat(j)*lvl1+scaled_th_dat(j+1)*lvl2;
-       %th0(j)=scaled_th_dat(j)*wf(1)+scaled_th_dat(j+1)*wf(2);
+      %th0(j)=scaled_th_dat(j)*lvl1+scaled_th_dat(j+1)*lvl2;
+       th0(j)=scaled_th_dat(j)*wf(1)+scaled_th_dat(j+1)*wf(2);
         th_200(j)=th0(j)-lvl3;
         th200(j)=th0(j)+lvl3;
     
@@ -162,7 +164,7 @@ end
        
 
 end 
-
+scaled_th_dat(1:numel(scaled_th_dat)-1)=scaled_th_dat(2:numel(scaled_th_dat));
 % 
 % 
 % for i=1:length(input_vector)/50

@@ -3,7 +3,7 @@
 function eq_data=ctle(input_vector, fz, fp1, fp2, HFboost, DCgain);
 
 
-d=10;
+d=9;
 Cp=34.06e-12;
 Rp=36.2e-3;
 Lp=5.06e-12;

@@ -1,4 +1,4 @@
-function [data, th_200, th0, th200, slope_sampled, dfe_coeffs, scaled_th_dat]=adapt_dfe(input_vector, rising_edge_detector, rising_edge_detector_shf, clk, dfe_coeffs, scaled_th_dat );
+function [data, th_200, th0, th200, slope_sampled, dfe_coeffs,scaled_th_dat]=adapt_dfe(input_vector, rising_edge_detector, rising_edge_detector_shf, clk, dfe_coeffs, scaled_th_dat);
 thresh=0.5;
 global min_eye_opening;
 global setup_t;
@@ -6,19 +6,21 @@ global hold_t;
 global unres_val;
 global sample;
 vector_length=length(input_vector);
-
+size_feed=3;
+ 
 prev_val=0;
 k=1;
 j=1;
-data=[];
-sampled=[];
+data=zeros(1,2);
+sampled=zeros(1,10);
 
 %wartości z odpowiedzi impulsowej
 
 miu=0.0005;%step
-    
+    size_feed=3;
     wf=dfe_coeffs(1:3);
-   
+%     sample = zeros(1, size_feed);
+
 prev_val=input_vector(1);
 setup(1)=1;
 
@@ -28,17 +30,17 @@ for i=1:vector_length
         sampled(i)= (input_vector(i)+(input_vector(i)-input_vector(i-1))*abs(clk(i)-thresh-clk(i-1)));
     end
 end
-%scaled_th_dat=[];
-%scaled_th_dat(1:2)=[-1.5 -1.5];
+% scaled_th_dat=zeros(1,3);
+% scaled_th_dat(1:2)=[-1.5 -1.5];
 
 th0=zeros(1,50000);
 th_200=zeros(1,50000);
-%th200=zeros(1,50000);
-th200=dfe_coeffs(4);
+th200=ones(1,50000);
+
 th0(1)=0;
-e=[];
+e=zeros(1,10);
 
-
+th200_k=dfe_coeffs(4);
 
 %-------------------- compare----------------%
 for i=1:vector_length 
@@ -60,21 +62,19 @@ end
 
 %-------------------- set threshold ----------------%
         th0(j)=scaled_th_dat(j)*wf(1)+scaled_th_dat(j+1)*wf(2);
+        th200(j)=th0(j)+30;
         
-        
-        if(sampled(i)>th200)
-            sig200(j)=1
+        if(sampled(i)>th200_k)
+            sig200(j)=1;
         else
-            sig200(j)=-1
+            sig200(j)=-1;
         end
         
         if dfe_coeffs(5)==1
-            if(sig200(j))==1
-                th200=th200+0.5
+            if(sig200)==1
+                th200_k=th200_k+0.5
             end
-            
         end
-        
 %-------------------- compare level 0 ----------------%
 
            % if(setup0(j)<setup_t || hold0(j)<hold_t)
@@ -111,7 +111,7 @@ end
         
         k=k+2;
         prev_val=data(j);
-        j=j+1;
+        j=j+1;  
         if(strcmp(unres_val, 'prev'))
             unres=prev_val;
         else
@@ -122,9 +122,10 @@ end
        
 
 end 
-max_c=1;
-dfe_coeffs=[ wf; th200; dfe_coeffs(5)];
-scaled_th_dat(1:numel(scaled_th_dat)-1)=scaled_th_dat(2:numel(scaled_th_dat))
+
+dfe_coeffs= [wf; th200_k; 0];
+scaled_th_dat(1:numel(scaled_th_dat)-1)=scaled_th_dat(2:numel(scaled_th_dat));
+
 
 % figure
 % hold on
