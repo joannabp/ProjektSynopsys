@@ -16,9 +16,9 @@ nonsignificant_bits=acc_size-10;
 error=0;
 curr_end_vco_prev=curr_end_vco;
 
-fprintf('odebrane dane to: %d, %d, %d',data(1),slope_in,data(2));
 v_df=0;
 if(t>1)
+    fprintf('odebrane dane to: %d, %d, %d',data_prev(1),data_prev(2),slope_in,data(1),data(2));
     v_df=phase_detector10(data,data_prev,slope_in);
 end
 

@@ -28,7 +28,7 @@ vector_length=400000;
 
 
 dlugosc_kanalu = 10;
-input_bytes=400;   % number of imput bytes
+input_bytes=800;   % number of imput bytes
 
 input_bits=input_bytes*8;
 over_sampling = 400;
@@ -60,7 +60,7 @@ vector_length2=round(vector_length*EUI*4/T);
 
 
 %---------------------Driver----------------------------------------------%
-[clk,t_clk,f_clk,~,~]=clk_gen_f_not_id5(freq,0,vector_length,0,vector_length2);
+[clk,t_clk,f_clk,~,~]=clk_gen_f_not_id5(1.01*freq,0,vector_length,0,vector_length2);
 driv_data = driv_script(input_data,clk);
 
 %vector_length=length(driv_data);
@@ -102,7 +102,7 @@ end
 for i=1:input_bits-8
     if~(data_c(i)==data(i))
         error=error+1;
-        i;
+        i
     end
 end
 % %---------------------Dodatki---------------------------------------------%
