@@ -1,4 +1,4 @@
-function  [out_data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf]=cdr_prob(input_vector)
+function  [out_data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf]=cdr_prob(input_vector, clk_driv)
 
 global input_bits;
 global sample;
@@ -71,8 +71,11 @@ while ((i<length(input_vector)-100) &&error_pll==0)
         th200_k(2)=0;
     end
     fprintf('petla cdr \n');
-
-    [data, slope, min_eye300_100_tmp, min_eye100_100_tmp, min_eye100_300_tmp,setup_200_tmp, setup0_tmp, setup200_tmp, hold_200_tmp, hold0_tmp, hold200_tmp, eyeO1_tmp, eyeO2_tmp, eyeO3_tmp, wf, th200_k, scaled_th_dat]=data_recovery(input_vector(i:i+t_vcos(j)+10), clk_out(i+t_vcos(j):i+2*t_vcos(j)+10), clk_out(i+2*t_vcos(j)+10:i+3*t_vcos(j)+20), wf, th200_k, scaled_th_dat);
+    clk2(i:i+t_vcos(j))=clk_out(i+t_vcos(j)/2:i+3/2*t_vcos(j));
+    [data, slope1, min_eye300_100_tmp, min_eye100_100_tmp, min_eye100_300_tmp,setup_200_tmp, setup0_tmp, setup200_tmp, hold_200_tmp, hold0_tmp, hold200_tmp, eyeO1_tmp, eyeO2_tmp, eyeO3_tmp, wf, th200_k, scaled_th_dat]=data_recovery(input_vector(i:i+t_vcos(j)), clk_out(i:i+t_vcos(j)), clk_out(i:i+t_vcos(j)), wf, th200_k, scaled_th_dat);
+    [data1, slope, min_eye300_100_tmp1, min_eye100_100_tmp1, min_eye100_300_tmp1,setup_200_tmp1, setup0_tmp1, setup200_tmp1, hold_200_tmp1, hold0_tmp1, hold200_tmp1, eyeO1_tmp1, eyeO2_tmp1, eyeO3_tmp1, wf1, th200_k1, scaled_th_dat1]=data_recovery(input_vector(i+t_vcos(j)/2:i+3/2*t_vcos(j)), clk_out(i:i+t_vcos(j)), clk_out(i+t_vcos(j)/2:i+3/2*t_vcos(j)), wf, th200_k, scaled_th_dat);
+    
+    %[data, slope, min_eye300_100_tmp, min_eye100_100_tmp, min_eye100_300_tmp,setup_200_tmp, setup0_tmp, setup200_tmp, hold_200_tmp, hold0_tmp, hold200_tmp, eyeO1_tmp, eyeO2_tmp, eyeO3_tmp, wf, th200_k, scaled_th_dat]=data_recovery(input_vector(i:i+t_vcos(j)+10), clk_driv(1+(i-1)*61 +25:i*61+25), clk_driv(1+(i-1)*61+50:i*61+50), wf, th200_k, scaled_th_dat);
     prev_val=data;
     curr=curr+t_vcos(j);
 
@@ -83,12 +86,12 @@ while ((i<length(input_vector)-100) &&error_pll==0)
 %     
 %     min_eye100_100(t)=min_eye100_100_tmp;
 %     min_eye100_300(t)=min_eye100_300_tmp;
-%     setup_200(t)=setup_200_tmp;
-%     setup0(t)=setup0_tmp;
-%     setup200(t)=setup200_tmp;
-%     hold_200(t)=hold_200_tmp;
-%     hold0(t)=hold0_tmp;
-%     hold200(t)=hold200_tmp;
+    setup_200(t)=setup_200_tmp;
+    setup0(t)=setup0_tmp;
+    setup200(t)=setup200_tmp;
+    hold_200(t)=hold_200_tmp;
+    hold0(t)=hold0_tmp;
+    hold200(t)=hold200_tmp;
 %     eyeO1(t)=eyeO1_tmp;
 %     eyeO2(t)=eyeO2_tmp;
 %     eyeO3(t)=eyeO3_tmp;
@@ -112,6 +115,8 @@ while ((i<length(input_vector)-100) &&error_pll==0)
 end
 
 figure
-plot(1:length(input_vector), input_vector, 1:length(input_vector), 50*clk_out(1:length(input_vector)));
+plot(1:length(clk2), input_vector(1:length(clk2)), 1:length(clk2), 50*clk_out(1:length(clk2)), 1:length(clk2), 50*clk2(1:length(clk2)));
 figure
 plot(f_vcos);
+figure
+plot(v_int_num);
