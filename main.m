@@ -4,7 +4,7 @@ clear all;
 close all;
 clc
  tic
-profile on
+%profile on
 global vector_length;
 global setup_t;
 global hold_t;
@@ -31,11 +31,11 @@ fp2=15.9e10;
 unres_val=-1; % -1/ 'prev'
 thr=0.5;
 min_eye_opening=10; %[mV]
-vector_length=2000000;
+vector_length=800000;
 
 
 dlugosc_kanalu = 10;
-input_bytes=4000;   % number of input bytes
+input_bytes=1600;   % number of input bytes
 
 input_bits=input_bytes*8;
 over_sampling = 300;
@@ -67,7 +67,7 @@ vector_length2=round(vector_length*EUI*4/T);
 
 
 %---------------------Driver----------------------------------------------%
-[clk,t_clk,f_clk,~,~]=clk_gen_f_not_id5(freq*1.005,0,vector_length,0,vector_length2);
+[clk,t_clk,f_clk,~,~]=clk_gen_f_not_id5(freq*1.001,0,vector_length,0,vector_length2);
 driv_data = driv_script(input_data,clk);
 
 %vector_length=length(driv_data);
@@ -155,4 +155,4 @@ ylabel(' data recovered');
 % setup=setup';
 % holdd=holdd';
 toc;
-profile off
+%profile off

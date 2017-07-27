@@ -138,6 +138,13 @@ global thr;
 global t0;
 global f0;
 global prev_val;
+global acc_size;
+global nonsignificant_bits;
+global f_vco_start;
+
+f_vco_start=1*freq;
+acc_size=14;
+nonsignificant_bits=acc_size-10;
 
 vector_length2=round(vector_length*EUI*4/T);
 delay=10;
@@ -151,11 +158,13 @@ t_vcos(1:delay)=T/EUI*freq/f_vco_start;
 %f_vcos_real=zeros(1,vector_length2);
 
 curr=1;
-
+z=0;
 j=1;
 %zmienna porzadkowa inkrementowana co wykryte zbocze zegara
 clk1_out=0;
 error_pll=0;
+kps=ones(1,vector_length2);
+kps=kps*8;
 %clk_out=zeros(1,25);
 [clk_out,~,~,clk1_out,curr_end_vco]=clk_gen_f_not_id5(f_vcos(1),0,vector_length,clk1_out,delay);
 clk_out=clk_out(12:curr_end_vco);
@@ -257,9 +266,10 @@ while ((i<length(input_vector)-100) &&error_pll==0)%&&j<50)
     
      %---------------------Clock_Recovery--------------------------------------%
     if(j>1)
-        [clk_o,clk_out,clk1_out,t_vcos(j+delay),f_vcos(j+delay),curr_end_vco,v_int_num(j),v_df,error_pll]=pll3(clk_out,clk1_out,curr_end_vco,v_int_num(j-1),data,out_data(k-2:k-1),slope_sampled(j-1),v_df,j);     
+        [clk_o,clk_out,clk1_out,t_vcos(j+delay),f_vcos(j+delay),curr_end_vco,v_int_num(j),kps(j+1),z,error_pll]=pll3(clk_out,clk1_out,curr_end_vco,v_int_num(j-1),data,out_data(k-2:k-1),slope_sampled(j-1),kps(j),z,j);     
+        %kps(j+1)=kpalg(kps(j),v_int_num(j),v_int_num(j-1));
     else
-        [clk_o,clk_out,clk1_out,t_vcos(j+delay),f_vcos(j+delay),curr_end_vco,v_int_num(j),v_df,error_pll]=pll3(clk_out,clk1_out,curr_end_vco,0,data,0,slopes,0,j);
+        [clk_o,clk_out,clk1_out,t_vcos(j+delay),f_vcos(j+delay),curr_end_vco,v_int_num(j),kps(j+1),z,error_pll]=pll3(clk_out,clk1_out,curr_end_vco,2^(acc_size-1)+(f_vco_start-freq)/10^6,data,0,slopes,kps(j),z,j);
     end
     clk2=[clk2 clk_o];
     k=k+2;
@@ -275,5 +285,7 @@ figure
 plot(f_vcos(1:j));
 figure
 plot(v_int_num(1:j));
+% figure
+%scatter(1:j,sl1(1:j),1:j,sl2(1:j));
 figure
-scatter(1:j,sl1(1:j),1:j,sl2(1:j));
+plot(kps(1:j))
