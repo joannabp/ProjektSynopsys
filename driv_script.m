@@ -24,7 +24,6 @@ for j=0:size(input_data,2)-1
 end
 
 driv_data=zeros(1,input_bits*50);
-driv_data(1)=pam4(1);
 trigger = 1;
 k=1;
 rand = randi([0 3], 1, 1);
@@ -63,7 +62,7 @@ driv_data=driv_data(1:i);
 
 
 alpha = 0.2;
-%driv_data = filter(alpha, [1 alpha-1], driv_data);
+driv_data = filter(alpha, [1 alpha-1], driv_data);
  
 
 

@@ -7,7 +7,7 @@ global acc_size;
 global nonsignificant_bits;
 
 f_vco_start=1*freq;
-acc_size=10;
+acc_size=14;
 nonsignificant_bits=acc_size-10;
 % kps=ones(1,vector_length2);
 % kps=kps*32;
@@ -24,9 +24,9 @@ if(t>1)
 end
 
 if(t==1)
-    [v_int,v_int_num]=integrate9(v_df,2^(acc_size-1)+(f_vco_start-freq)/10^6,1,1);
+    [v_int,v_int_num]=integrate9(v_df,2^(acc_size-1)+(f_vco_start-freq)/10^6,32,1);
 else
-    [v_int,v_int_num]=integrate9(v_df,v_int_num,1,1);
+    [v_int,v_int_num]=integrate9(v_df,v_int_num,32,1);
 end
 
 f_vco=freq_change6(v_int);

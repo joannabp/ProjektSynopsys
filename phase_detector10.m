@@ -39,5 +39,5 @@ elseif(d1==-3&&d2==3||d1==-1&&d2==1)
         v_df_ret=1;
     end
 else
-    v_df_ret=v_df_prev;
+    v_df_ret=0;%v_df_prev;
 end

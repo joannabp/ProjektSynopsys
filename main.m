@@ -21,17 +21,24 @@ global train_ena;
 global input_bits;
 train_ena=1;
 
+global fp1;
+global fp2;
+%fp1=7e9;
+%fp2=1e12;
+fp1=9.8e9;
+fp2=15.9e10;
+
 unres_val=-1; % -1/ 'prev'
 thr=0.5;
 min_eye_opening=10; %[mV]
-vector_length=400000;
+vector_length=2000000;
 
 
 dlugosc_kanalu = 10;
-input_bytes=1200;   % number of imput bytes
+input_bytes=4000;   % number of input bytes
 
 input_bits=input_bytes*8;
-over_sampling = 400;
+over_sampling = 300;
 freq = 10^10;     % 10GHz
 T = 1/freq;       % 0.1ns
 EUI=T/50;
@@ -51,7 +58,7 @@ end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-input_data=generate_binary_data(input_bytes, 'none');
+input_data=generate_binary_data(input_bytes, 'ctle_pulses');
 
 input_bits=numel(input_data);
 vector_length2=round(vector_length*EUI*4/T);
@@ -60,7 +67,7 @@ vector_length2=round(vector_length*EUI*4/T);
 
 
 %---------------------Driver----------------------------------------------%
-[clk,t_clk,f_clk,~,~]=clk_gen_f_not_id5(1*freq,0,vector_length,0,vector_length2);
+[clk,t_clk,f_clk,~,~]=clk_gen_f_not_id5(freq*1.005,0,vector_length,0,vector_length2);
 driv_data = driv_script(input_data,clk);
 
 %vector_length=length(driv_data);
@@ -69,20 +76,23 @@ driv_data = driv_script(input_data,clk);
 
 
 channel_data = channel(driv_data);
-%channel_data=driv_data;
- eq_dat=ctle(channel_data, 5e8, 6e9, 12e9, 13, -10); % (signal, fz, fp1, fp2, HFboost, DCgain)
- 
+% eq_dat=ctle_back(channel_data, 5e8, 6e9, 12e9, 0, -10); % (signal, fz, fp1,
+ %fp2, HFboost, DCgain)
+%eq_dat=ctle(channel_data, 1.5e9, 12); % (signal, fz, gain)
+%eq_dat=ctle(channel_data, 1.5e9, 9); % (signal, fz, gain)
+eq_dat=ctle(channel_data, 1.5e9, 12); % (signal, fz, gain)
 
 %---------------------Data_Recovery---------------------------------------%
 
-% clk_zero=[];
-% clk_zero(1:50)=0;
-% clk_ideal=[clk_zero clk_ideal];
-% clk_zero_s(1:70)=0;
-% clk_shf=[clk_zero_s clk_ideal];
+%  clk_zero=[];
+%  clk_zero(1:25)=0;
+% % clk_ideal=[clk_zero clk_ideal];
+% % clk_zero_s(1:70)=0;
+% % clk_shf=[clk_zero_s clk_ideal];
+% clk_s=[clk_zero clk(1:length(clk)-25)];
+%[data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf] = data_recovery(eq_dat, clk_ideal,clk_shf);% clk_shf);  
 
-%[data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf] = data_recovery(eq_dat, clk_ideal,clk_shf);% clk_shf);     
-[data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk1,clk2]=cdr_prob(eq_dat);
+[data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf]=cdr_prob(driv_data);
 
 error=0;
 k=1;
@@ -99,7 +109,15 @@ for i=1:8:input_bits-8
 end
 
 
+% 
+% b =
+% 
+%                    0   0.572232284109855  -0.568636842630042
 
+
+% a =
+
+%    1.000000000000000  -1.773805328941535   0.785175113211590
 for i=1:input_bits-8
     if~(data_c(i)==data(i))
         error=error+1;
@@ -111,23 +129,23 @@ end
 % figure
 % plot(time, driv_data, time, eq_dat, time, clk(1:numel(driv_data));%, time, clk(1:numel(clk_shf)-120)*10);
 % ylabel('data driver, channel, clock');
-
+over_sampling=50;
 figure
 for i=1:length(driv_data)/over_sampling/3
-    plot(-over_sampling:over_sampling-1, driv_data(over_sampling/2+1+3*over_sampling*(i-1):3*over_sampling*(i) -over_sampling/2));
+    plot(-over_sampling:over_sampling-1, driv_data(1+2*over_sampling*(i-1):2*over_sampling*(i)));
     hold on
 end
 
 
 figure
 for i=1:length(channel_data)/over_sampling/3
-    plot(-over_sampling:over_sampling-1, channel_data(over_sampling+1+3*over_sampling*(i-1):3*over_sampling*(i) )) ;
+    plot(-over_sampling:over_sampling-1, channel_data(over_sampling/2+1+3*over_sampling*(i-1):3*over_sampling*(i) -over_sampling/2)) ;
     hold on
 end
 
 figure
 for i=1:length(eq_dat)/over_sampling/3
-    plot(-over_sampling:over_sampling-1, eq_dat(over_sampling+1+3*over_sampling*(i-1):3*over_sampling*(i) )) ;
+    plot(-over_sampling:over_sampling-1, eq_dat(over_sampling/2+1+3*over_sampling*(i-1):3*over_sampling*(i) -over_sampling/2 )) ;
     hold on
 end
 

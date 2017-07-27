@@ -10,9 +10,9 @@ function [clk,t_clk,f_clk,clk1,curr_end,indeks]=clk_gen_f_not_id3(f_in,start,sto
         t
         %[curr_end,t_clk(t),f_clk(t),clk1]=attenuate(f_in,curr,clk1,t0,f0,t);
         if(t==1)
-            [curr_end,t_clk(t),f_clk(t),clk1,indeks]=attenuate2(f_in,curr,clk1,t0,f0,t,0);
+            [curr_end,t_clk(t),f_clk(t),clk1,indeks]=attenuate(f_in,curr,clk1,t0,f0,t,0);
         else
-            [curr_end,t_clk(t),f_clk(t),clk1,indeks]=attenuate2(f_in,curr,clk1,t0,f0,t,indeks);
+            [curr_end,t_clk(t),f_clk(t),clk1,indeks]=attenuate(f_in,curr,clk1,t0,f0,t,indeks);
         end
 %         f_diff=10^9;
 %         while((abs(f_diff)>10^8)&&(j<13))
