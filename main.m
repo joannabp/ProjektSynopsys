@@ -31,18 +31,18 @@ fp2=15.9e10;
 unres_val=-1; % -1/ 'prev'
 thr=0.5;
 min_eye_opening=10; %[mV]
-vector_length=800000;
+vector_length=200000;
 
 
 dlugosc_kanalu = 10;
-input_bytes=1600;   % number of input bytes
+input_bytes=800;   % number of input bytes
 
-input_bits=input_bytes*8;
+input_bits=input_bytes*8; % number of input bits
 over_sampling = 300;
 freq = 10^10;     % 10GHz
 T = 1/freq;       % 0.1ns
 EUI=T/50;
-   % number of input bits
+   
 %time = (0:T/over_sampling:T*input_bits-(T/over_sampling));
 %clk_ideal=clk_ideal_gen(input_bits,over_sampling);
 setup_t=2*T/50; % *2ns
@@ -67,7 +67,7 @@ vector_length2=round(vector_length*EUI*4/T);
 
 
 %---------------------Driver----------------------------------------------%
-[clk,t_clk,f_clk,~,~]=clk_gen_f_not_id5(freq*1.001,0,vector_length,0,vector_length2);
+[clk,t_clk,f_clk,~,~]=clk_gen_f_not_id5(freq*1.001,0,vector_length,0,vector_length2,1);
 driv_data = driv_script(input_data,clk);
 
 %vector_length=length(driv_data);
@@ -92,7 +92,9 @@ eq_dat=ctle(channel_data, 1.5e9, 12); % (signal, fz, gain)
 % clk_s=[clk_zero clk(1:length(clk)-25)];
 %[data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf] = data_recovery(eq_dat, clk_ideal,clk_shf);% clk_shf);  
 
-[data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf]=cdr_prob(driv_data);
+[data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,-1,1*freq,-1,-1);
+
+[data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco2,f_vco_end2,v_int_end2,kp_end2]=cdr_prob(eq_dat,clk_vco,f_vco_end,v_int_end,kp_end);
 
 error=0;
 k=1;
