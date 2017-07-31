@@ -1,13 +1,12 @@
 function [setup_200, setup0, setup200, hold_200, hold0, hold200, data]=setup_hold_check(input_vector, clk, rising_edge_detector, th0, th_200, th200, data); 
-thresh=0.5;
+global thr;
 global min_eye_opening;
 global setup_t;
 global hold_t;
-global T;
+
 global unres_val;
-global over_sampling;
-global prev_val;
-global EUI;
+
+global UI_probes;
 
 vector_length=length(input_vector);
 % % ------------------- check setup time ------------% ---- 
@@ -146,17 +145,17 @@ end
 
 
 
-setup_200=setup_200*EUI;
-setup0=setup0*EUI;
-setup200=setup200*EUI;
+setup_200=setup_200*UI_probes;
+setup0=setup0*UI_probes;
+setup200=setup200*UI_probes;
 
 setup_200=setup_200-setup_t;
 setup0=setup0-setup_t;
 setup200=setup200-setup_t;
 
-hold_200=hold_200*EUI-hold_t;
-hold0=hold0*EUI-hold_t;
-hold200=hold200*EUI-hold_t;
+hold_200=hold_200*UI_probes-hold_t;
+hold0=hold0*UI_probes-hold_t;
+hold200=hold200*UI_probes-hold_t;
 k=1;
 
 for i=1:j 

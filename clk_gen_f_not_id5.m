@@ -1,8 +1,8 @@
-function [clk,t_clk,f_clk,clk1,curr_end]=clk_gen_f_not_id5(f_in,start,stop,clk1,vector_length2,full)
+function [clk,t_clk,f_clk,clk1,curr_end]=clk_gen_f_not_id5(f_in,start,stop,clk1,vector_length2, dr)
     global t0;
     global f0;
-    if(full==1)
-        clk=zeros(1,stop-start);
+    if(dr==1)
+    clk=zeros(1,stop-start);
     end
     %t_clk=zeros(1,vector_length2);
     %f_clk=zeros(1,vector_length2);

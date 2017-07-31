@@ -132,4 +132,4 @@ plot(eq_dat, 'color',[rand(1),rand(1),rand(1)]);
 %plot(channel_data4);
 hold off
    
-
+save('test.mat', 'wf');

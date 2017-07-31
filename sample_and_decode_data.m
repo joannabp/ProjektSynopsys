@@ -1,13 +1,12 @@
-function [data_rec, th_200, th0, th200, slope_sampled, wf, scaled_th_dat, sample]=sample_and_decode_data(input_vector, rising_edge_detector, rising_edge_detector_shf, clk, wf, scaled_th_dat, sample);
-thresh=0.5;
-global min_eye_opening;
-global setup_t;
-global hold_t;
+function [data_rec, th_200, th0, th200, slope_sampled, wf, scaled_th_dat, sample]=sample_and_decode_data(input_vector, rising_edge_detector, rising_edge_detector_shf, clk, wf, scaled_th_dat, sample)
+global thr;
+
 global unres_val;
+global peak_val;
 
 vector_length=length(input_vector);
 
-prev_val=0;
+% prev_val=0;
 k=1;
 j=1;
 data=zeros(1,2);
@@ -25,23 +24,26 @@ miu=0.0005;%step
 
 e=zeros(1,10); 
 
-prev_val=input_vector(1);
-setup(1)=1;
+% prev_val=input_vector(1);
+% setup(1)=1;
 
 for i=1:vector_length 
     sampled(i)=0;
     if rising_edge_detector(i)==1
-        sampled(i)= (input_vector(i)+(input_vector(i)-input_vector(i-1))*abs(clk(i)-thresh-clk(i-1)));
+        sampled(i)= (input_vector(i)+(input_vector(i)-input_vector(i-1))*abs(clk(i)-thr-clk(i-1)));
         
     end
 end
 %scaled_th_dat=[];
 %scaled_th_dat(1:2)=[-1.5 -1.5];
 
-th_200=zeros(1,50000);
-th0=zeros(1,50000);
-th200=zeros(1,50000);
+% th_200=zeros(1,50000);
+% th0=zeros(1,50000);
+% th200=zeros(1,50000);
 
+th_200=zeros(1,50);
+th0=zeros(1,50);
+th200=zeros(1,50);
 th_200(1)=-200;
 th0(1)=0;
 th200(1)=200;
@@ -68,10 +70,11 @@ end
 %-------------------- set threshold ----------------%
 %th0(j)=0;
       %th0(j)=scaled_th_dat(j)*lvl1+scaled_th_dat(j+1)*lvl2;
+      
        th0(j)=scaled_th_dat(j)*wf(1)+scaled_th_dat(j+1)*wf(2);
-        th_200(j)=th0(j)-lvl3;
-        th200(j)=th0(j)+lvl3;
-    
+        th_200(j)=th0(j)-peak_val*2;
+        th200(j)=th0(j)+peak_val*2;
+      
         
         %---------- compare level -200 ---------------%
             %if(setup_200(j)<setup_t || hold_200(j)<hold_t)

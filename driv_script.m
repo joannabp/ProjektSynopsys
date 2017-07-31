@@ -1,6 +1,5 @@
 function driv_data=driv_script(input_data,clk);
 
-global train_ena;
 global input_bits;
 
 pam4 = zeros(1,size(input_data,2)*size(input_data,1)/2);
