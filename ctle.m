@@ -1,7 +1,8 @@
 %channel
 
-function eq_data=ctle(input_vector, fz, fp1, fp2, HFboost, DCgain);
-
+function eq_data=ctle(input_vector, fz, gain);
+global fp1;
+global fp2;
 
 d=9;
 Cp=34.06e-12;
@@ -31,22 +32,20 @@ Hch = 1./ (1 + j*w*R*C);
  wp1=fp1*pi*2;
  wp2=fp2*pi*2;
 
-if(HFboost==0)
+
+ HFboost=20*log10(wp1/wz)
    
-    
-    HFboost=20*log10(wp1/wz);
+    DCgain=gain-HFboost
     
 
     
-else
-    wz=wp1/(10^(HFboost/20));
-    
-end
+
 
 
 
 gmCp=wp2*10^(DCgain/20)*(10^(HFboost/20));
 Hct =gmCp* (j*w +wz)./((j*w +wp1).*(j*w +wp2));
+
 
 figure
 semilogx(w/(2*pi),20*log10(abs(Hct)), 'color',[1 0 0])
@@ -76,8 +75,8 @@ b=gmCp*[0 1/T wz-1/T];
 a0=[1/T wp1-1/T];
 a1=[1/T wp2-1/T];
 a=conv(a0, a1);
-b=b/a(1);
-a=a/a(1);
+b=b/a(1)
+a=a/a(1)
 eq_data=filter(b,a, input_vector);
 
 

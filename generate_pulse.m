@@ -2,7 +2,12 @@
 %function data_out=generate_pulse(input_data, length);
 close all
 clear all
-
+global fp1;
+global fp2;
+%fp1=7e9;
+%fp2=1e12;
+fp1=9.8e9;
+fp2=15.5e10;
 
 over_sampling=50;
 input_data=[1 1];
@@ -46,7 +51,7 @@ end
 
 
 
-  eq_dat=ctle(channel_data1, 5e8, 6e9, 12e9, 13, -10); % (signal, fz, fp1, fp2, HFboost, DCgain)
+ eq_dat=ctle(channel_data1, 1.5e9, 12); % (signal, fz, gain)
 % input_data2=[-200 -200 -200 -200 -200 200 -200 0 0 0 0 0];
 % for i=1:12 
 %     ov_data2(1+(i-1)*50:i*50)=input_data2(i);
@@ -127,4 +132,4 @@ plot(eq_dat, 'color',[rand(1),rand(1),rand(1)]);
 %plot(channel_data4);
 hold off
    
-
+save('test.mat', 'wf');

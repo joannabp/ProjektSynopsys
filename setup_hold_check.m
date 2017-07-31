@@ -7,6 +7,7 @@ global T;
 global unres_val;
 global over_sampling;
 global prev_val;
+global EUI;
 
 vector_length=length(input_vector);
 % % ------------------- check setup time ------------% ---- 
@@ -145,17 +146,17 @@ end
 
 
 
-setup_200=setup_200*T/50;
-setup0=setup0*T/50;
-setup200=setup200*T/50;
+setup_200=setup_200*EUI;
+setup0=setup0*EUI;
+setup200=setup200*EUI;
 
 setup_200=setup_200-setup_t;
 setup0=setup0-setup_t;
 setup200=setup200-setup_t;
 
-hold_200=hold_200*T/50-hold_t;
-hold0=hold0*T/50-hold_t;
-hold200=hold200*T/50-hold_t;
+hold_200=hold_200*EUI-hold_t;
+hold0=hold0*EUI-hold_t;
+hold200=hold200*EUI-hold_t;
 k=1;
 
 for i=1:j 

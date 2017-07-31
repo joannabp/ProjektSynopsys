@@ -1,79 +1,86 @@
-function eq_data = ctle_back(input_vector);
+%channel
 
-format long
-fz=5e9;
-fp1=8e10;
-fp2=12e10;
-wz=fz*3.14*2;
-wp1=fp1*3.14*2;
-wp2=fp2*3.14*2;
-a0=[1-wp1 -1];
-a1=[1-wp2 -1];
-a=conv(a0,a1);
-b=(4e10)*[(1-wz) 1]/a(1);
-a=a/a(1);
+function eq_data=ctle_back(input_vector, fz, fp1, fp2, HFboost, DCgain);
 
-% b=[1 wz];
-% a0=[1 wp1];
-% a1=[1 wp2];
-% 
-% a=wp1;
-% b=wp2;
-% w=wz;
 
-% b = [1 2*3.14*fz];
-%  a0 = [1 2*3.14*fp1];
-%  a1 = [1 2*3.14*fp2];
-%  a=conv(a0,a1);
-% d=1;
-% Cp=34.06e-12;
-% Rp=36.2e-3;
-% Lp=5.06e-9;
-% C=Cp*d;
-% R=Rp*d;
-% L=Lp*d;
+d=9;
+Cp=34.06e-12;
+Rp=36.2e-3;
+Lp=5.06e-12;
+C=Cp*d;
+R=Rp*d;
+L=Lp*d;
+
+
+
+%syms s
+
+w = logspace(0,13, 500);
 % 
-% b=[1 -1];
-% a=[1 -1/exp(R/L)];
-%  
-% b0=(4e10)*(a*exp(b)*(b-w));
-%  b0=w*exp(b)*(a-b)+b*exp(a)*(w-a);
-%  b1=(4e10)*(a*exp(b)*(w-b)+w*(b-a)+b*exp(a)*(a-w));
-% % 
-% % 
-% a0=a^2*b*exp(b)-b^2*a*exp(b);
-%  a1=a^2*b+b^2*a;
-% % 
-% % 
-%  a1=a1/a0;
-%  b0=b0/a0;
-%  b1=b1/a0;
-% ac=[1 a1];
-%  bc=(4e10)*[b0 b1];
-  eq_data =filter(b, a, input_vector);
-% %  w = logspace(0,20,32);
-% %  
-% %  
-% %  H = (bc(1)+j*w*bc(2)) ./ (ac(1)+ j*w*ac(2)); 
-% %  
-% % subplot(2,1,1)
-% % semilogx(w,20*log10(abs(H)))
-% % title('Bode Plot for a very simple H(j\omega)');
-% % ylabel('Magnitude (dB)')
-% % 
-% % subplot(2,1,2)
-% % semilogx(w, 180/pi * unwrap(angle(H)))
-% % xlabel('Frequency (Hz)'), ylabel('Phase (degrees)')
+ b=[1 ];
+ a=[1  R*C*i*w];
+%Hch = (1 + j*w*10e-11).*(1 + j*w*4e-11)./ ((1 + j*w*R*C).*(1 + j*w*15e-10).*(1 + j*w*2e-12)); 
+ 
+Hch = 1./ (1 + j*w*R*C); 
+
+
+% fz=5e8;
+% fp1=1.5e9;
+% fp2=6e9;
+ wz=fz*pi*2;
+ wp1=fp1*pi*2;
+ wp2=fp2*pi*2;
+
+if(HFboost==0)
+   
+    
+    HFboost=20*log10(wp1/wz)
+    
+
+    
+else
+    wz=wp1/(10^(HFboost/20));
+    
+end
+
+
+
+gmCp=wp2*10^(DCgain/20)*(10^(HFboost/20));
+Hct =gmCp* (j*w +wz)./((j*w +wp1).*(j*w +wp2));
+
+figure
+semilogx(w/(2*pi),20*log10(abs(Hct)), 'color',[1 0 0])
+title('Bode Plot for a very simple H(j\omega)');
+ylabel('Magnitude (dB)')
+xlabel('Frequency [Hz]')
+hold on
+
+semilogx(w/(2*pi),20*log10(abs(Hch)),'color',[0 0 0])
+title('Bode Plot for a very simple H(j\omega)');
+ylabel('Magnitude (dB)')
+
+semilogx(w/(2*pi),(20*log10(abs(Hch)) +20*log10(abs(Hct))))
+
+
+T=2e-12;
+% Tfa=2/T;
+
+% b=[Tfa+wz 2*wz wz-Tfa];
+% a=[(Tfa^2+Tfa*(wp1-wp2)+wp1*wp2) (-2*Tfa^2+2*wp1*wp2) (Tfa^2-Tfa*(wp1+wp2)+wp1*wp2)];
 % 
-% % w = logspace(-1,20);
-% % h=freqs(b,a,w);
-% % 
-% % mag = abs(h); 
-% % phase = angle(h);
-% % subplot(2,1,1), loglog(w,mag)
-% % subplot(2,1,2), semilogx(w,phase)
-% 
-% 
-% % figure
-% % plot(filtered_data(1:500))
-% % ylabel('filtered_data');
+% b=gmCp*b/a(1);
+% a=a/a(1);
+
+b=gmCp*[0 1/T wz-1/T];
+
+a0=[1/T wp1-1/T];
+a1=[1/T wp2-1/T];
+a=conv(a0, a1);
+b=b/a(1)
+a=a/a(1)
+eq_data=filter(b,a, input_vector);
+
+
+
+
+
