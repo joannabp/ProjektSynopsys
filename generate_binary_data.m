@@ -21,13 +21,17 @@ elseif strcmp(training_seq,'none')
         end
     end
 elseif strcmp(training_seq,'pulses_&&_ctle')
-    pulses_seq=[0; 1;  1; 0; 0; 1; 1; 0;];
+    seq=[0; 1;  0; 1; 1; 0; 0; 1;];
    
         for i=1:input_bytes
-            if(i<input_bytes/2)
-                input_data(:,i)=pulses_seq;
+            if(mod(i, 25)==0)
+                input_data(:,i)=seq;
+            elseif (mod(i, 15)==0)
+                 input_data(:,i) = [0; 1;  1; 0; 1; 0; 0; 1;];
             else
-                 input_data(:,i) = randi([0 1], 8, 1);
+                input_data(:,i) = [1; 0;  1; 0; 1; 0; 1; 0;];
+%             else
+%                 input_data(:,i)=randi([0 1], 1, 1);
             end
         end  
     

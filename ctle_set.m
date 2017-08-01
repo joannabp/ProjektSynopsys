@@ -2,7 +2,7 @@
 function [cur_set, fz, gain]=ctle_set(prev_set)
 %clc
 %close all;
-clear all
+
 
 global ctle_adapt;
 %fp1=9.8e9;
@@ -33,7 +33,7 @@ switch cur_set
         fz=3.5e9;
         gain=12;
     case 4
-        fz=2.5e9;
+        fz=3e9;
         gain=12;
     case 5
         fz=2.5e9;

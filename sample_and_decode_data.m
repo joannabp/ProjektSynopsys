@@ -71,6 +71,7 @@ end
 %th0(j)=0;
       %th0(j)=scaled_th_dat(j)*lvl1+scaled_th_dat(j+1)*lvl2;
       
+      %th0(j)=0;
        th0(j)=scaled_th_dat(j)*wf(1)+scaled_th_dat(j+1)*wf(2);
         th_200(j)=th0(j)-peak_val*2;
         th200(j)=th0(j)+peak_val*2;

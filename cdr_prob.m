@@ -1,6 +1,6 @@
 
 
-function  [out_data, slope_sampled, min_eye300_100, min_eye100_100,min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_out,f_vco_end,v_int_end,kp_end]=cdr_prob(input_vector,clk_start,f_vco_start,v_int_start,kp_start)
+function  [out_data, slope_sampled, min_eye300_100, min_eye100_100,min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_o,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(input_vector,clk_start,clk1_out,f_vco_start,v_int_start,kp_start)
 
 
 global input_bits;
@@ -19,6 +19,7 @@ global f0;
 global prev_val;
 global acc_size;
 global nonsignificant_bits;
+global ctle_adapt;
 
 
 acc_size=14;
@@ -28,10 +29,10 @@ vector_length2=round(vector_length*UI_probes_mid*4/T_mid);
 delay=0;
 curr=1;
 z=0;
-zmax=16;
+zmax=5;
 j=1;
 %zmienna porzadkowa inkrementowana co wykryte zbocze zegara
-clk1_out=0;
+%clk1_out=0;
 end_pll=0;
 f_vcos=zeros(1,vector_length2);
 f_vcos(1)=f_vco_start;
@@ -98,7 +99,7 @@ prev_val=[0,0]
 
 prev_peak_sampled=1;
 
-
+ctle_val=0;
 
 %-----------------------%---------------------------------%----------------
 while ((i<length(input_vector)-100) &&end_pll==0)%&&j<50)
@@ -168,13 +169,23 @@ while ((i<length(input_vector)-100) &&end_pll==0)%&&j<50)
         [clk_o,clk_out,clk1_out,t_vcos(j+delay),f_vcos(j+delay),curr_end_vco,v_int_num(j),kps(j+1),z,zmax,end_pll]=pll3(clk_out,clk1_out,curr_end_vco,v_int_num(j),data,0,slopes,kps(j),z,zmax,j);
     end
     clk2=[clk2 clk_o];
+    
+    
+    
+       %---------------------Ctle_adapt----------------------------------
+   if(j>4 && ctle_val==0)
+        fprintf('ctle_adapt \n');
+       ctle_val=ctle_adaptation(out_data(k-6:k+1), slope_sampled(j-2:j-1))
+    end
+   %-----------------------------------------------------------% 
     k=k+2;
     j=j+1;
     %----------------------------------------------------------------------
     %---
     
 end
-clk_out=clk_out(1:curr_end_vco);
+fprintf('zegar wyjsciowy od %d do %d, przesuniecie %d\n',sl1(j-10)+t_vcos(j-10)/2,curr_end_vco,t_vcos(j-10)/2);
+clk_o=clk_out(sl1(j-10)+t_vcos(j-10)/2:curr_end_vco);
 f_vco_end=f_vcos(j+delay-1);
 v_int_end=v_int_num(j-1);
 kp_end=kps(j);
@@ -184,10 +195,10 @@ end
 figure
 plot(1:length(clk2), input_vector(1:length(clk2)), 1:length(clk2), 50*clk_out(1:length(clk2)), 1:length(clk2), 50*clk2(1:length(clk2)));
 figure
-plot(f_vcos(1:j));
+plot(f_vcos(1:j-1));
 figure
-plot(v_int_num(1:j));
+plot(v_int_num(1:j-1));
 % figure
 %scatter(1:j,sl1(1:j),1:j,sl2(1:j));
 figure
-plot(kps(1:j))
+plot(kps(1:j-1))

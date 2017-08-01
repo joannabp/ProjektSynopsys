@@ -34,8 +34,8 @@ length=1;
 %     
 % input_data1=[-300 -300 -300 -300 -300 300 -300 -300 -300 -300 -300 -300];
 
-%input_data1=[-100 -100 -100 -100 -100 100 -100 -100 -100 -100 -100]; % pam 2 
-input_data1=[0 0 0 0 0 200 0 0 0 0 0]; % pam 2 
+input_data1=[-100 -100 -100 -100 -100 100 -100 -100 -100 -100 -100]; % pam 2 
+%input_data1=[0 0 0 0 0 200 0 0 0 0 0]; % pam 2 
   % input_data1= (randn(3000, 1)>0)*2-1;  % Random bipolar (-1, 1) sequence;
  %  input_data1=input_data1*200;
 %  input_data1=[-100 100 -100 -100 100 100 100 100 100 -100 -100 100 100 100 -100 -100 -100 100 100 100]; % pam 2 
@@ -51,7 +51,7 @@ end
 
 
 
- eq_dat=ctle(channel_data1, 1.5e9, 12); % (signal, fz, gain)
+ eq_dat=ctle(channel_data1, 2.5e9, 12); % (signal, fz, gain)
 % input_data2=[-200 -200 -200 -200 -200 200 -200 0 0 0 0 0];
 % for i=1:12 
 %     ov_data2(1+(i-1)*50:i*50)=input_data2(i);
