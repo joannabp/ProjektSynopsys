@@ -5,7 +5,7 @@ vector_length=length(input_vector);
 
 
 sampled=zeros(1,10);
-
+peak_sampled=0;
 
 for i=1:vector_length 
     sampled(i)=0;
@@ -32,7 +32,7 @@ for i=1:vector_length
         
       th=th+2*peak_sampled;
     else 
-        peak_sampled=0;
+        %
     end
 end
           

@@ -15,11 +15,11 @@ global T_mid;
 global T;
 
 dlugosc_kanalu = 10;
-input_bytes=1000;   % number of input bytes for clk sync
+input_bytes=3000;   % number of input bytes for clk sync
 input_bits=input_bytes*8;
 
 freq_mid = 10e9;     % 10GHz
-freq=10e9;
+freq=10.1e9;
 T_mid = 1/freq_mid;       % 0.1ns
 T = 1/freq;       % 0.1ns
 UI_probes_mid=T_mid/50;
@@ -54,7 +54,7 @@ global t0;
 global f0;
 
 thr=0.5;
-vector_length=250000;
+vector_length=750000;
 t0=[54,52,50,48,46];
 f0=zeros(1,5);
 
@@ -101,7 +101,7 @@ save('pulses_20kB_10G_3_2_5e9all.mat');
 %% ctle adapt
 %close all;
     input_bytes=500;
-    peak_val=70;
+    peak_val=40;
 
     input_data=generate_binary_data(input_bytes, 'pulses_&&_ctle');
     input_bits=numel(input_data);
