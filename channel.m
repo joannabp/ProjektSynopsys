@@ -19,7 +19,8 @@ w = logspace(0,20,32);
  b=[1];
  a=[1  R*C*i*w]
 H = 1 ./ (1 + j*w*R*C); 
- 
+
+figure 
 subplot(2,1,1)
 semilogx(w,20*log10(abs(H)))
 title('Bode Plot for a very simple H(j\omega)');

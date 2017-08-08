@@ -1,4 +1,4 @@
-function [out_data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf, th200_k, scaled_th_dat, sample]=data_recovery(input_vector, clk, clk_shf, wf, th200_k, scaled_th_dat, sample)
+function [out_data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300, setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf, th200_k, scaled_th_dat, sample]=data_recovery(input_vector, clk, clk_shf, wf, th200_k, scaled_th_dat, sample)
 
 
 global thr;

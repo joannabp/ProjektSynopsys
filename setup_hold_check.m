@@ -3,6 +3,7 @@ global thr;
 global min_eye_opening;
 global setup_t;
 global hold_t;
+global prev_val;
 
 global unres_val;
 

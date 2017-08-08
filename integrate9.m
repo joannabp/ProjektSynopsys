@@ -1,4 +1,4 @@
-function [v_int,v_int_ret,kp,z,zmax]=integrate9(v_df,v_int_prev,kp,ki,z,zmax)
+function [v_int,v_int_ret,kp,z]=integrate9(v_df,v_int_prev,kp,ki,z,zmax)
   global acc_size;
   v_int=zeros(1,acc_size);
   v_int_prev
@@ -28,15 +28,15 @@ function [v_int,v_int_ret,kp,z,zmax]=integrate9(v_df,v_int_prev,kp,ki,z,zmax)
 %   
   if(z*(v_int_num-v_int_prev)<0&&kp>1)
       kp=1;
-  elseif(abs(z)==zmax)%&&kp<128) 
+  elseif(abs(z)>=zmax)%&&kp<128) 
       if(kp<4)
         kp=kp*2;
-      elseif(kp<16)
+      elseif(kp<32)
         kp=kp+4;
-      elseif(kp<40)
-        kp=kp+8;
-      elseif(kp<128)
-        kp=kp+16;
+%       elseif(kp<32)
+%         kp=kp+8;
+%       elseif(kp<128)
+%         kp=kp+16;
       end
       z=0;
   end

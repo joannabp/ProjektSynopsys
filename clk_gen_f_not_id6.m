@@ -1,4 +1,4 @@
-function [clk,t_clk,f_clk,clk1,curr_end]=clk_gen_f_not_id5(f_in,start,stop,clk1,vector_length2, dr)
+function [clk,t_clk,f_clk,clk1,curr_end]=clk_gen_f_not_id6(f_in,t_prev,start,stop,clk1,vector_length2, dr)
     global t0;
     global f0;
     if(dr==1)
@@ -16,27 +16,21 @@ function [clk,t_clk,f_clk,clk1,curr_end]=clk_gen_f_not_id5(f_in,start,stop,clk1,
         f_diff=f_in-f0(j);
     end
     f_diff=f_diff/10^6
-    t_clk=t0(j);
+    t_clk=t_prev;%t0(j);
     f_clk=f0(j);
     while(curr<stop-start&&t<=vector_length2)%&&t<120)
         %t
-        clk1=clk1+f_diff/(f0(j+1)-f0(j-1))*10^6;
+        clk1=clk1+f_diff/400;
         if(clk1>0.5)
             shift=-1;
             clk1=clk1-0.5;
-            %t_clk=t_clk-1;
+            t_clk=t_clk-1;
         elseif(clk1<0)
             shift=1;
             clk1=clk1+0.5;
-            %t_clk=t_clk+1;
+            t_clk=t_clk+1;
         else
             shift=0;
-        end
-        if(clk1>0.5)
-            clk1=0.4999;
-        end
-        if(clk1<0)
-            clk1=0;
         end
         %clk1
         curr_end=curr+t0(j)-1+shift;
