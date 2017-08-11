@@ -21,6 +21,9 @@ function [clk,t_clk,f_clk,clk1,curr_end]=clk_gen_f_not_id5(f_in,start,stop,clk1,
     while(curr<stop-start&&t<=vector_length2)%&&t<120)
         %t
         clk1=clk1+f_diff/(f0(j+1)-f0(j-1))*10^6;
+        %if(dr==0)
+            %fprintf('clk1 wynosi: %d\n',clk1);
+        %end
         if(clk1>0.5)
             shift=-1;
             clk1=clk1-0.5;
@@ -39,7 +42,10 @@ function [clk,t_clk,f_clk,clk1,curr_end]=clk_gen_f_not_id5(f_in,start,stop,clk1,
             clk1=0;
         end
         %clk1
-        curr_end=curr+t0(j)-1+shift;
+        curr_end=curr+t0(j)-1+shift*2;
+        %if(dr==0)
+            %fprintf('generacja od: %d do %d\n',curr+start,curr_end+start);
+        %end
         clk(curr:curr_end)=clk_not_id3(t0(j),curr,curr_end+1,clk1,shift);
 %         fprintf('zegar wygenerowany od %d do %d\n',start+curr,start+curr_end);
 %         fprintf('------------------------------------------------------\n');

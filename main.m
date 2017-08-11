@@ -15,11 +15,11 @@ global T_mid;
 global T;
 
 dlugosc_kanalu = 10;
-input_bytes=3000;   % number of input bytes for clk sync
+input_bytes=16000;   % number of input bytes for clk sync
 input_bits=input_bytes*8;
 
 freq_mid = 10e9;     % 10GHz
-freq=10.1e9;
+freq=10.2e9;
 T_mid = 1/freq_mid;       % 0.1ns
 T = 1/freq;       % 0.1ns
 UI_probes_mid=T_mid/50;
@@ -38,11 +38,9 @@ global fp2;
 
 ctle_adapt=0;
 set_peak_value=0;
-peak_val=90;
+peak_val=70;
 fp1=9.8e9;
 fp2=15.9e10;
-setup_t=5*T/50; % 
-hold_t=5*T/50; % 
 unres_val=-1; % -1/ 'prev'
 min_eye_opening=10; %[mV]
 
@@ -54,7 +52,7 @@ global t0;
 global f0;
 
 thr=0.5;
-vector_length=750000;
+vector_length=250*input_bytes;
 t0=[54,52,50,48,46];
 f0=zeros(1,5);
 
@@ -77,8 +75,11 @@ vector_length2=round(vector_length*UI_probes_mid*4/T);
 
 %---------------------Driver----------------------------------------------%
 [clk,t_clk,~,~,~]=clk_gen_f_not_id5(freq,0,vector_length,0,vector_length2,1);
+clk=clk(floor(t_clk/2)+2:length(clk));
 driv_data = driv_script(input_data,clk);
 UI_probes=t_clk;
+setup_t=5*1/(UI_probes*freq); % 
+hold_t=5*1/(UI_probes*freq); % 
 %vector_length=length(driv_data);
 
 %---------------------Channel---------------------------------------------%
@@ -101,11 +102,12 @@ save('pulses_20kB_10G_3_2_5e9all.mat');
 %% ctle adapt
 %close all;
     input_bytes=500;
-    peak_val=40;
+    vector_length=250*input_bytes;
 
     input_data=generate_binary_data(input_bytes, 'pulses_&&_ctle');
     input_bits=numel(input_data);
     [clk,t_clk,~,~,~]=clk_gen_f_not_id5(freq,0,vector_length,0,vector_length2,1);
+    clk=clk(floor(t_clk/2)+2:length(clk));
     driv_data = driv_script(input_data,clk);
     UI_probes=t_clk;
     channel_data = channel(driv_data);
@@ -125,30 +127,35 @@ save('pulses_20kB_10G_3_2_5e9all.mat');
 
     %% dfe peak adapt
     set_peak_value=1;
+    peak_val=40;
     input_bytes=500;
+    vector_length=250*input_bytes;
     %close all;
     input_data=generate_binary_data(input_bytes, 'dfe_pulses');
     input_bits=numel(input_data);
     [clk,t_clk,~,~,~]=clk_gen_f_not_id5(freq,0,vector_length,0,vector_length2,1);
+    clk=clk(floor(t_clk/2)+2:length(clk));
     driv_data = driv_script(input_data,clk);
     UI_probes=t_clk;
     channel_data = channel(driv_data);
   
     eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
-    [data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk1_out,f_vco_end,v_int_end,1,4);
+    [data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk1_out,f_vco_end,v_int_end,1,4);
     set_peak_value=0;
     
  %% data transfer   
-    input_bytes=500;
+    input_bytes=5000;
+    vector_length=250*input_bytes;
     input_data=generate_binary_data(input_bytes, 'none');
     input_bits=numel(input_data);
     [clk,t_clk,~,~,~]=clk_gen_f_not_id5(freq,0,vector_length,0,vector_length2,1);
+    clk=clk(floor(t_clk/2)+2:length(clk));
     driv_data = driv_script(input_data,clk);
     UI_probes=t_clk;
     channel_data = channel(driv_data);
 
     eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
-    [data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk1_out,f_vco_end,v_int_end,1,0);
+    [data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco2,clk1_out,f_vco_end,v_int_end,1,0);
    
     
     

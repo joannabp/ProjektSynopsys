@@ -36,24 +36,29 @@ f_vcos=zeros(1,vector_length2);
 f_vcos(1)=f_vco_start;
 %t_vcos=zeros(1,vector_length2);
 %t_vcos(1)=T_mid/UI_probes_mid*freq_mid/f_vco_start;
+t_clk1=zeros(1,vector_length2);
+t_clk2=zeros(1,vector_length2);
+t_clk1(1)=round(T_mid/UI_probes_mid*freq_mid/f_vco_start);
+t_clk2(1)=round(T_mid/UI_probes_mid*freq_mid/f_vco_start);
+
 if(clk_start==-1)
-    delay=10;
+    delay=3;
     [clk,~,~,clk1,curr_end_vco]=clk_gen_f_not_id5(f_vcos(1),0,vector_length,clk1,delay,0);
     fprintf('startowy zegar wyjsciowy wygenerowany do %d\n',curr_end_vco);
     f_vcos(2:delay)=f_vco_start;
     %t_vcos(2:delay)=T_mid/UI_probes_mid*freq_mid/f_vco_start;
-    clk=clk(12:curr_end_vco);
-    curr_end_vco=curr_end_vco-11;
+    %clk=clk(floor(t_clk1(1)/4):curr_end_vco);
+    %curr_end_vco=curr_end_vco-11;
 else
     clk=clk_start;
     curr_end_vco=length(clk);
 end
-clk2=clk(26:curr_end_vco);
+clk2=clk(t_clk1(1)/2+1:curr_end_vco);
 v_int_num=zeros(1,vector_length);                                %numeryczna wartosc napiecia wyjsciowego integratora
 if(v_int_start~=-1)
     v_int_num(1)=v_int_start;
 else
-    v_int_num(1)=2^(acc_size-1)+(f_vco_start-freq_mid)/10^6;
+    v_int_num(1)=round(2^(acc_size-1)+(f_vco_start-freq_mid)/10^6*2^nonsignificant_bits);
 end
 kps=ones(1,vector_length2);
 %kps=kps*32;
@@ -86,11 +91,6 @@ eyeO2=zeros(1,input_bits);
 eyeO3=zeros(1,input_bits);
 sl1=zeros(1,vector_length2);
 sl2=zeros(1,vector_length2);
-t_clk1=zeros(1,vector_length2);
-t_clk2=zeros(1,vector_length2);
-t_clk1(1)=round(T_mid/UI_probes_mid*freq_mid/f_vco_start);
-t_clk2(1)=round(T_mid/UI_probes_mid*freq_mid/f_vco_start);
-
 th200_k= [20; 0];
 scaled_th_dat=[-1.5, -1.5, -1.5];
 prev_val=[0,0]
@@ -119,10 +119,10 @@ while ((i<length(input_vector)-100) &&end_pll==0)%&&j<50)
     i
     fprintf('t vco: %d \n',t_clk1(j));
     fprintf('pobierany clk od %d do %d\n',i,i+t_clk1(j));
-    [data, slope1, min_eye300_100_tmp, min_eye100_100_tmp, min_eye100_300_tmp,setup_200_tmp, setup0_tmp, setup200_tmp, hold_200_tmp, hold0_tmp, hold200_tmp, eyeO1_tmp, eyeO2_tmp, eyeO3_tmp, wf, th200_k, scaled_th_dat, sample]=data_recovery(input_vector(i:i+t_clk1(j)), clk(i:i+t_clk1(j)), clk(i:i+t_clk1(j)), wf, th200_k, scaled_th_dat, sample);
+    [data, ~, min_eye300_100_tmp, min_eye100_100_tmp, min_eye100_300_tmp,setup_200_tmp, setup0_tmp, setup200_tmp, hold_200_tmp, hold0_tmp, hold200_tmp, eyeO1_tmp, eyeO2_tmp, eyeO3_tmp, wf, th200_k, scaled_th_dat, sample]=data_recovery(input_vector(i:i+t_clk1(j)), clk(i:i+t_clk1(j)), clk(i:i+t_clk1(j)), wf, th200_k, scaled_th_dat, sample);
     
-    fprintf('pobierany clk2 od %d do %d\n',i+round(t_clk2(j)/2),i+round(3/2*t_clk2(j))+1);
-    [data1, slopes, min_eye300_100_tmp1, min_eye100_100_tmp1, min_eye100_300_tmp1,setup_200_tmp1, setup0_tmp1, setup200_tmp1, hold_200_tmp1, hold0_tmp1, hold200_tmp1, eyeO1_tmp1, eyeO2_tmp1, eyeO3_tmp1, wf1, th200_k1, scaled_th_dat1, sample1]=data_recovery(input_vector(i+round(t_clk2(j)/2):i+round(3/2*t_clk2(j))+1), clk2(i:i+t_clk2(j)+10), clk2(i+round(t_clk2(j)/2):i+round(3/2*t_clk2(j))+1), wf, th200_k, scaled_th_dat, sample);
+    fprintf('pobierany clk2 od %d do %d\n',i+floor(t_clk2(j)/2),i+floor(3/2*t_clk2(j)));
+    [~, slp, ~, ~, ~,~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~]=data_recovery(input_vector(i+floor(t_clk2(j)/2):i+floor(3/2*t_clk2(j))), clk2(i:i+t_clk2(j)), clk2(i+floor(t_clk2(j)/2):i+floor(3/2*t_clk2(j))), wf, th200_k, scaled_th_dat, sample);
     
     %---- set peak_val --------%
     if(set_peak_value==1 && mod(j,4)==0)
@@ -138,7 +138,7 @@ while ((i<length(input_vector)-100) &&end_pll==0)%&&j<50)
     prev_val=data;
 
     out_data(k: k+1)=data; 
-    slope_sampled(j)=slopes;
+    slope_sampled(j)=slp;
     
 %     min_eye300_100(t)=min_eye300_100_tmp;
 %     
@@ -161,7 +161,7 @@ while ((i<length(input_vector)-100) &&end_pll==0)%&&j<50)
     if(j>1)
         [clk_o,clk,clk1,~,f_vcos(j+delay),curr_end_vco,v_int_num(j),kps(j+1),z,end_pll]=pll3(clk,clk1,curr_end_vco,v_int_num(j-1),data,out_data(k-2:k-1),slope_sampled(j-1),kps(j),z,zmax,ph_det_mode,j);     
     else
-        [clk_o,clk,clk1,~,f_vcos(j+delay),curr_end_vco,v_int_num(j),kps(j+1),z,end_pll]=pll3(clk,clk1,curr_end_vco,v_int_num(j),data,0,slopes,kps(j),z,ph_det_mode,zmax,j);
+        [clk_o,clk,clk1,~,f_vcos(j+delay),curr_end_vco,v_int_num(j),kps(j+1),z,end_pll]=pll3(clk,clk1,curr_end_vco,v_int_num(j),data,0,slp,kps(j),z,ph_det_mode,zmax,j);
     end
     clk2=[clk2 clk_o];
     
@@ -178,7 +178,8 @@ while ((i<length(input_vector)-100) &&end_pll==0)%&&j<50)
         
 end
 fprintf('zegar wyjsciowy od %d do %d, przesuniecie %d\n',sl1(j-10)+t_clk1(j-10)/2,curr_end_vco,t_clk2(j-10)/2);
-clk_o=clk(sl1(j-10)+ceil(t_clk1(j-10)/2):curr_end_vco);
+clk_o=clk(sl1(j-1)+ceil(t_clk1(j-1)/4):curr_end_vco);
+%clk_o=clk(sl1(j-1):curr_end_vco);
 f_vco_end=f_vcos(j-1);
 v_int_end=v_int_num(j-1);
 kp_end=kps(j);

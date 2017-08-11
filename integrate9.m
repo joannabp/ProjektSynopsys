@@ -27,12 +27,20 @@ function [v_int,v_int_ret,kp,z]=integrate9(v_df,v_int_prev,kp,ki,z,zmax)
 %   end
 %   
   if(z*(v_int_num-v_int_prev)<0&&kp>1)
-      kp=1;
+      %kp=1;
+      if(mod(kp,2)==1)
+          kp=kp-1;
+      end
+      kp=kp/2;
+      %z=-z/abs(z);
   elseif(abs(z)>=zmax)%&&kp<128) 
       if(kp<4)
         kp=kp*2;
-      elseif(kp<32)
+      elseif(kp<64)
         kp=kp+4;
+        if(kp>64)
+          kp=64;
+        end
 %       elseif(kp<32)
 %         kp=kp+8;
 %       elseif(kp<128)
