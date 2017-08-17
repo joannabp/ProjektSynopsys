@@ -189,14 +189,20 @@ end
 % figure
 % plot(t_clk1(2:j)-t_clk2(1:j-1))
 % ylabel('okresy vco');
-% if(ph_det_mode==1||ph_det_mode==0)
     figure
     plot(1:length(clk2), input_vector(1:length(clk2)), 1:length(clk2), 50*clk(1:length(clk2)), 1:length(clk2), 50*clk2(1:length(clk2)));
     if(ph_det_mode==1)
         ylabel('zegary prob. w czasie synchronizacji');
-    else
+    elseif(ph_det_mode==2)
+        ylabel('zegary prob. i dane ctle1');
+    elseif(ph_det_mode==3)
+        ylabel('zegary prob. i dane ctle2');
+    elseif(ph_det_mode==4)
+        ylabel('zegary prob. i dane dfe');
+    elseif(ph_det_mode==0)
         ylabel('zegary prob. i dane');
     end
+if(ph_det_mode==1||ph_det_mode==0)
     figure
     plot(f_vcos(1:j-1));
     if(ph_det_mode==1)
