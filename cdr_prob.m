@@ -27,7 +27,7 @@ nonsignificant_bits=acc_size-10;
 vector_length2=round(vector_length*UI_probes_mid*4/T_mid);
 delay=0;
 z=0;
-zmax=5;
+zmax=10;
 j=1;
 %zmienna porzadkowa inkrementowana co wykryte zbocze zegara
 %clk1=0;
@@ -42,7 +42,7 @@ t_clk1(1)=round(T_mid/UI_probes_mid*freq_mid/f_vco_start);
 t_clk2(1)=round(T_mid/UI_probes_mid*freq_mid/f_vco_start);
 
 if(clk_start==-1)
-    delay=3;
+    delay=10;
     [clk,~,~,clk1,curr_end_vco]=clk_gen_f_not_id5(f_vcos(1),0,vector_length,clk1,delay,0);
     fprintf('startowy zegar wyjsciowy wygenerowany do %d\n',curr_end_vco);
     f_vcos(2:delay)=f_vco_start;
@@ -53,7 +53,7 @@ else
     clk=clk_start;
     curr_end_vco=length(clk);
 end
-clk2=clk(t_clk1(1)/2+1:curr_end_vco);
+clk2=clk(t_clk1(1)/2+2:curr_end_vco);
 v_int_num=zeros(1,vector_length);                                %numeryczna wartosc napiecia wyjsciowego integratora
 if(v_int_start~=-1)
     v_int_num(1)=v_int_start;
@@ -161,7 +161,7 @@ while ((i<length(input_vector)-100) &&end_pll==0)%&&j<50)
     if(j>1)
         [clk_o,clk,clk1,~,f_vcos(j+delay),curr_end_vco,v_int_num(j),kps(j+1),z,end_pll]=pll3(clk,clk1,curr_end_vco,v_int_num(j-1),data,out_data(k-2:k-1),slope_sampled(j-1),kps(j),z,zmax,ph_det_mode,j);     
     else
-        [clk_o,clk,clk1,~,f_vcos(j+delay),curr_end_vco,v_int_num(j),kps(j+1),z,end_pll]=pll3(clk,clk1,curr_end_vco,v_int_num(j),data,0,slp,kps(j),z,ph_det_mode,zmax,j);
+        [clk_o,clk,clk1,~,f_vcos(j+delay),curr_end_vco,v_int_num(j),kps(j+1),z,end_pll]=pll3(clk,clk1,curr_end_vco,v_int_num(j),data,0,slp,kps(j),z,zmax,ph_det_mode,j);
     end
     clk2=[clk2 clk_o];
     
@@ -186,10 +186,10 @@ kp_end=kps(j);
 if(length(clk2)>length(input_vector))
     clk2=clk2(1:length(input_vector));
 end
-figure
-plot(t_clk1(2:j)-t_clk2(1:j-1))
-ylabel('okresy vco');
-if(ph_det_mode==1||ph_det_mode==0)
+% figure
+% plot(t_clk1(2:j)-t_clk2(1:j-1))
+% ylabel('okresy vco');
+% if(ph_det_mode==1||ph_det_mode==0)
     figure
     plot(1:length(clk2), input_vector(1:length(clk2)), 1:length(clk2), 50*clk(1:length(clk2)), 1:length(clk2), 50*clk2(1:length(clk2)));
     if(ph_det_mode==1)
