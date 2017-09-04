@@ -22,7 +22,7 @@ if (data==[0 1 0 1 1 0 0 1])% || data==[1;1;0;1])
                 ctle_adapt=1;
                  ctle_s=1;
            else
-               ctle_adapt=0;
+               ctle_adapt=1;
               
            end
         end

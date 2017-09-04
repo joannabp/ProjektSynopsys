@@ -42,7 +42,7 @@ t_clk1(1)=round(T_mid/UI_probes_mid*freq_mid/f_vco_start);
 t_clk2(1)=round(T_mid/UI_probes_mid*freq_mid/f_vco_start);
 
 if(clk_start==-1)
-    delay=10;
+    delay=3;
     [clk,~,~,clk1,curr_end_vco]=clk_gen_f_not_id5(f_vcos(1),0,vector_length,clk1,delay,0);
     fprintf('startowy zegar wyjsciowy wygenerowany do %d\n',curr_end_vco);
     f_vcos(2:delay)=f_vco_start;

@@ -15,16 +15,21 @@ global T_mid;
 global T;
 
 dlugosc_kanalu = 10;
-input_bytes=1000;   % number of input bytes for clk sync
+input_bytes=7000;   % number of input bytes for clk sync
 input_bits=input_bytes*8;
 
 freq_mid = 10e9;     % 10GHz
-freq=10e9;
+freq=10.1e9;
 T_mid = 1/freq_mid;       % 0.1ns
 T = 1/freq;       % 0.1ns
 UI_probes_mid=T_mid/50;
 
-
+% 10-10.02 GHz - <1kb
+%10.05 - 2kb
+%9.98 - <1kb
+%9.95 - 1.5kb
+%9.9 - 4kb
+%10.1 - 6-6.5 kb
 %------ data_rec ----- %%
 global setup_t;
 global hold_t;
@@ -38,7 +43,7 @@ global fp2;
 
 ctle_adapt=0;
 set_peak_value=0;
-peak_val=50;
+peak_val=80;
 fp1=9.8e9;
 fp2=15.9e10;
 unres_val=-1; % -1/ 'prev'
@@ -92,7 +97,7 @@ channel_data = channel(driv_data);
 eq_dat=ctle(channel_data, 1.5e9, 12); % (signal, fz, gain)
 %eq_dat=ctle(channel_data, 0.7e9, 12); % (signal, fz, gain)
 
-save('pulses_20kB_10G_3_2_5e9all.mat');
+%save('pulses_20kB_10G_3_2_5e9all.mat');
 
 %% cdr
 
@@ -114,9 +119,8 @@ save('pulses_20kB_10G_3_2_5e9all.mat');
     [cur_set, fz, gain]=ctle_set(prev_set);
     eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
     [data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk1_out,f_vco_end,v_int_end,1,2);
-    t=0;
-    while (ctle_adapt~=0&&t<2)
-        t=t+1;
+
+    while (ctle_adapt~=0)
         %close all
         prev_set=cur_set;
         [cur_set, fz, gain]=ctle_set(prev_set);
