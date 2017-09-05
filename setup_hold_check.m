@@ -164,7 +164,7 @@ for i=1:j
      if(setup200<0 || hold200<0 || setup0<0 || hold0<0 || setup_200<0 || hold_200<0)
        %  data(1:2)=unres;
        %data(1:2)=0;
-        data(1:2)=prev_val;
+      data(1:2)=prev_val;
      end
      k=k+2;
       %prev_val(1:2)=data(1:2);

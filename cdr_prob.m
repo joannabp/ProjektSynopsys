@@ -101,7 +101,7 @@ ctle_val=0;
 
 %-----------------------%---------------------------------%----------------
 while ((i<length(input_vector)-100) &&end_pll==0)%&&j<50)
-    if(mod(t,4)==0)
+    if(mod(t-5,4)==0)
         th200_k(2)=1;
     else
         th200_k(2)=0;
@@ -125,9 +125,9 @@ while ((i<length(input_vector)-100) &&end_pll==0)%&&j<50)
     [~, slp, ~, ~, ~,~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~]=data_recovery(input_vector(i+floor(t_clk2(j)/2):i+floor(3/2*t_clk2(j))), clk2(i:i+t_clk2(j)), clk2(i+floor(t_clk2(j)/2):i+floor(3/2*t_clk2(j))), wf, th200_k, scaled_th_dat, sample);
     
     %---- set peak_val --------%
-    if(set_peak_value==1 && mod(j,4)==0)
+    if(set_peak_value==1 && j>5 && (isequal(out_data(k-6:k-1),[0 1 0 1 0 1])))
        [peak_val, peak_sampled]=set_peak_val(input_vector(i:i+t_clk1(j)), clk(i:i+t_clk1(j)), peak_val)
-       if(prev_peak_sampled~=peak_sampled && j>2 )
+       if(prev_peak_sampled~=peak_sampled && j>10 )
             set_peak_value=0;
        else
             prev_peak_sampled=peak_sampled;

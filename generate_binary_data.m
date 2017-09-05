@@ -9,7 +9,7 @@ if strcmp(training_seq,'pulses')
     end
 elseif strcmp(training_seq,'dfe_pulses')
 
-ctle_seq=[0; 1;  0; 1; 0; 1; 1; 0;];
+ctle_seq=[1; 0;  0; 1; 0; 1; 0; 1;];
 
     for i=1:input_bytes
         input_data(:,i)=ctle_seq;

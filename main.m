@@ -15,11 +15,11 @@ global T_mid;
 global T;
 
 dlugosc_kanalu = 10;
-input_bytes=7000;   % number of input bytes for clk sync
+input_bytes=4500;   % number of input bytes for clk sync
 input_bits=input_bytes*8;
 
 freq_mid = 10e9;     % 10GHz
-freq=10.1e9;
+freq=10e9;
 T_mid = 1/freq_mid;       % 0.1ns
 T = 1/freq;       % 0.1ns
 UI_probes_mid=T_mid/50;
@@ -43,7 +43,7 @@ global fp2;
 
 ctle_adapt=0;
 set_peak_value=0;
-peak_val=80;
+peak_val=60;
 fp1=9.8e9;
 fp2=15.9e10;
 unres_val=-1; % -1/ 'prev'
@@ -82,9 +82,9 @@ vector_length2=round(vector_length*UI_probes_mid*4/T);
 [clk,t_clk,~,~,~]=clk_gen_f_not_id5(freq,0,vector_length,0,vector_length2,1);
 clk=clk(floor(t_clk/2)+2:length(clk));
 driv_data = driv_script(input_data,clk);
-UI_probes=t_clk;
-setup_t=5*1/(UI_probes*freq); % 
-hold_t=5*1/(UI_probes*freq); % 
+UI_probes=1/(t_clk*freq);
+setup_t=5*UI_probes; % 
+hold_t=5*UI_probes; % 
 %vector_length=length(driv_data);
 
 %---------------------Channel---------------------------------------------%
@@ -94,7 +94,7 @@ channel_data = channel(driv_data);
 % eq_dat=ctle_back(channel_data, 5e8, 6e9, 12e9, 0, -10); % (signal, fz, fp1,
  %fp2, HFboost, DCgain)
 %eq_dat=ctle(channel_data, 1.5e9, 12); % (signal, fz, gain)
-eq_dat=ctle(channel_data, 1.5e9, 12); % (signal, fz, gain)
+eq_dat=ctle(channel_data, 2.5e9, 12); % (signal, fz, gain)
 %eq_dat=ctle(channel_data, 0.7e9, 12); % (signal, fz, gain)
 
 %save('pulses_20kB_10G_3_2_5e9all.mat');
@@ -106,16 +106,17 @@ eq_dat=ctle(channel_data, 1.5e9, 12); % (signal, fz, gain)
 
 %% ctle adapt
 %close all;
-    input_bytes=500;
+    input_bytes=50;
+    peak_val=80;
     vector_length=250*input_bytes;
     input_data=generate_binary_data(input_bytes, 'pulses_&&_ctle');
     input_bits=numel(input_data);
     [clk,t_clk,~,~,~]=clk_gen_f_not_id5(freq,0,vector_length,0,vector_length2,1);
     clk=clk(floor(t_clk/2)+2:length(clk));
     driv_data = driv_script(input_data,clk);
-    UI_probes=t_clk;
+    UI_probes=1/(t_clk*freq);
     channel_data = channel(driv_data);
-    prev_set=7;
+    prev_set=5;
     [cur_set, fz, gain]=ctle_set(prev_set);
     eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
     [data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk1_out,f_vco_end,v_int_end,1,2);
@@ -140,7 +141,7 @@ eq_dat=ctle(channel_data, 1.5e9, 12); % (signal, fz, gain)
     [clk,t_clk,~,~,~]=clk_gen_f_not_id5(freq,0,vector_length,0,vector_length2,1);
     clk=clk(floor(t_clk/2)+2:length(clk));
     driv_data = driv_script(input_data,clk);
-    UI_probes=t_clk;
+    UI_probes=1/(t_clk*freq);
     channel_data = channel(driv_data);
   
     eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
@@ -155,7 +156,7 @@ eq_dat=ctle(channel_data, 1.5e9, 12); % (signal, fz, gain)
     [clk,t_clk,~,~,~]=clk_gen_f_not_id5(freq,0,vector_length,0,vector_length2,1);
     clk=clk(floor(t_clk/2)+3:length(clk));
     driv_data = driv_script(input_data,clk);
-    UI_probes=t_clk;
+    UI_probes=1/(t_clk*freq);
     channel_data = channel(driv_data);
 
     eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
@@ -190,6 +191,7 @@ x=abs(data_c-data(1:input_bits-8));
 % figure
 % plot(time, driv_data, time, eq_dat, time, clk(1:numel(driv_data));%, time, clk(1:numel(clk_shf)-120)*10);
 % ylabel('data driver, channel, clock');
+UI_probes=t_clk;
 figure
 for i=1:length(driv_data)/UI_probes/3
     plot(-UI_probes:UI_probes-1, driv_data(1+2*UI_probes*(i-1):2*UI_probes*(i)));
