@@ -11,7 +11,6 @@ global peak_val;
 global vector_length;
 global freq_mid;     % 10GHz
 global UI_probes_mid;      % 0.002ns
-global T_mid;        % 0.1ns 
 global thr;
 global t0;
 global f0;
@@ -21,6 +20,20 @@ global nonsignificant_bits;
 global ctle_adapt;
 
 
+global T_mid;        % 0.1ns 
+global PJ_tot;
+global PVCO;
+global Temp;
+global TJ;
+global F;
+Temp=300;
+F=1;
+PVCO=100;
+TJ=Temp*F/PVCO*1e-3;
+
+
+PJ_prev=PJ_tot;
+PJ_tot=0;
 acc_size=14;
 nonsignificant_bits=acc_size-10;
 
@@ -61,7 +74,9 @@ else
     v_int_num(1)=round(2^(acc_size-1)+(f_vco_start-freq_mid)/10^6*2^nonsignificant_bits);
 end
 kps=ones(1,vector_length2);
-%kps=kps*32;
+% if(ph_det_mode==1)
+%     kps=kps*64;
+% end
 % if(kp_start~=-1)
 %     kps(1)=kp_start;
 % end
@@ -159,9 +174,9 @@ while ((i<length(input_vector)-100) &&end_pll==0)%&&j<50)
     
     %---------------------Clock_Recovery--------------------------------------%
     if(j>1)
-        [clk_o,clk,clk1,~,f_vcos(j+delay),curr_end_vco,v_int_num(j),kps(j+1),z,end_pll]=pll3(clk,clk1,curr_end_vco,v_int_num(j-1),data,out_data(k-2:k-1),slope_sampled(j-1),kps(j),z,zmax,ph_det_mode,j);     
+        [clk_o,clk,clk1,~,f_vcos(j+delay),curr_end_vco,v_int_num(j),kps(j+1),z,end_pll]=pll3(clk,clk1,curr_end_vco,v_int_num(j-1),data,out_data(k-2:k-1),slope_sampled(j-1),kps(j),z,ph_det_mode,j);     
     else
-        [clk_o,clk,clk1,~,f_vcos(j+delay),curr_end_vco,v_int_num(j),kps(j+1),z,end_pll]=pll3(clk,clk1,curr_end_vco,v_int_num(j),data,0,slp,kps(j),z,zmax,ph_det_mode,j);
+        [clk_o,clk,clk1,~,f_vcos(j+delay),curr_end_vco,v_int_num(j),kps(j+1),z,end_pll]=pll3(clk,clk1,curr_end_vco,v_int_num(j),data,0,slp,kps(j),z,ph_det_mode,j);
     end
     clk2=[clk2 clk_o];
     
@@ -177,12 +192,18 @@ while ((i<length(input_vector)-100) &&end_pll==0)%&&j<50)
     %---
         
 end
-fprintf('zegar wyjsciowy od %d do %d, przesuniecie %d\n',sl1(j-10)+t_clk1(j-10)/2,curr_end_vco,t_clk2(j-10)/2);
-clk_o=clk(sl1(j-1)+ceil(t_clk1(j-1)/4):curr_end_vco);
+PJ_tot=PJ_prev;
+x=mod(round(rand()*100),10)-5;
+%fprintf('zegar wyjsciowy od %d do %d, przesuniecie %d\n',(sl1(j-1)+ceil(t_clk1/4)+x),curr_end_vco,(ceil(t_clk1/4)+x));
+if(ph_det_mode~=0)
+    clk_o=clk(sl1(j-1)+ceil(t_clk1/4)+x:curr_end_vco);
+else
+    clk_o=clk;
+end
 %clk_o=clk(sl1(j-1):curr_end_vco);
 f_vco_end=f_vcos(j-1);
 v_int_end=v_int_num(j-1);
-kp_end=kps(j);
+kp_end=kps(j-1);
 if(length(clk2)>length(input_vector))
     clk2=clk2(1:length(input_vector));
 end

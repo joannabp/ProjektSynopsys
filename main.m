@@ -15,11 +15,11 @@ global T_mid;
 global T;
 
 dlugosc_kanalu = 10;
-input_bytes=4500;   % number of input bytes for clk sync
+input_bytes=2000;   % number of input bytes for clk sync
 input_bits=input_bytes*8;
 
 freq_mid = 10e9;     % 10GHz
-freq=10e9;
+freq=9.99e9;
 T_mid = 1/freq_mid;       % 0.1ns
 T = 1/freq;       % 0.1ns
 UI_probes_mid=T_mid/50;
@@ -52,9 +52,24 @@ min_eye_opening=10; %[mV]
 
 % ----- clocks ----%%
 
+global PJ;
+global PJ_tot;
+global f_PJ;
+global peak_jit;
+global BER;
+
 global thr;
 global t0;
 global f0;
+
+
+f_PJ=1e8; %czestotliwosc Periodic Jitter
+PJ=2e-14; %jedno przesuniecie okresu w wyniku PJ
+PJ_tot=0; %zmienna akumulacyjna PJ, po freq/f_PJ zmienia kierunek zmian okresu
+
+BER=1e-12;
+peak_jit=[3.891 4.417 4.892 5.327 5.731 6.109 6.467 6.807 7.131 7.441 7.739];
+peak_jit=peak_jit(log10(1e-3/BER));
 
 thr=0.5;
 vector_length=250*input_bytes;
@@ -64,10 +79,6 @@ f0=zeros(1,5);
 for i=1:5
     f0(i)=T_mid/t0(i)*freq_mid/UI_probes_mid;
 end
-
-%time = (0:T/over_sampling:T*input_bits-(T/over_sampling));
-%clk_ideal=clk_ideal_gen(input_bits,over_sampling);
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -80,7 +91,11 @@ vector_length2=round(vector_length*UI_probes_mid*4/T);
 
 %---------------------Driver----------------------------------------------%
 [clk,t_clk,~,~,~]=clk_gen_f_not_id5(freq,0,vector_length,0,vector_length2,1);
-clk=clk(floor(t_clk/2)+2:length(clk));
+clk=clk(t_clk/2+mod(round(rand()*100),10)-5:length(clk));
+f_clks=freq_check(clk);
+figure
+plot(f_clks(2:length(f_clks)))
+ylabel('cz. zegara sekwencji synchronizujacej');
 driv_data = driv_script(input_data,clk);
 UI_probes=1/(t_clk*freq);
 setup_t=5*UI_probes; % 
@@ -94,7 +109,7 @@ channel_data = channel(driv_data);
 % eq_dat=ctle_back(channel_data, 5e8, 6e9, 12e9, 0, -10); % (signal, fz, fp1,
  %fp2, HFboost, DCgain)
 %eq_dat=ctle(channel_data, 1.5e9, 12); % (signal, fz, gain)
-eq_dat=ctle(channel_data, 2.5e9, 12); % (signal, fz, gain)
+eq_dat=ctle(channel_data, 1.5e9, 12); % (signal, fz, gain)
 %eq_dat=ctle(channel_data, 0.7e9, 12); % (signal, fz, gain)
 
 %save('pulses_20kB_10G_3_2_5e9all.mat');
@@ -112,23 +127,23 @@ eq_dat=ctle(channel_data, 2.5e9, 12); % (signal, fz, gain)
     input_data=generate_binary_data(input_bytes, 'pulses_&&_ctle');
     input_bits=numel(input_data);
     [clk,t_clk,~,~,~]=clk_gen_f_not_id5(freq,0,vector_length,0,vector_length2,1);
-    clk=clk(floor(t_clk/2)+2:length(clk));
+    clk=clk(t_clk/2+mod(round(rand()*100),10)-5:length(clk));
     driv_data = driv_script(input_data,clk);
     UI_probes=1/(t_clk*freq);
     channel_data = channel(driv_data);
-    prev_set=5;
+    prev_set=7;
     [cur_set, fz, gain]=ctle_set(prev_set);
     eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
     [data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk1_out,f_vco_end,v_int_end,1,2);
 
-    while (ctle_adapt~=0)
-        %close all
-        prev_set=cur_set;
-        [cur_set, fz, gain]=ctle_set(prev_set);
-        eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)   
-        fprintf('curset %d', cur_set);
-        [data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk1_out,f_vco_end,v_int_end,1,3);
-    end
+%     while (ctle_adapt~=0)
+%         %close all
+%         prev_set=cur_set;
+%         [cur_set, fz, gain]=ctle_set(prev_set);
+%         eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)   
+%         fprintf('curset %d', cur_set);
+%         [data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk1_out,f_vco_end,v_int_end,1,3);
+%     end
 
     %% dfe peak adapt
     set_peak_value=1;
@@ -139,7 +154,7 @@ eq_dat=ctle(channel_data, 2.5e9, 12); % (signal, fz, gain)
     input_data=generate_binary_data(input_bytes, 'dfe_pulses');
     input_bits=numel(input_data);
     [clk,t_clk,~,~,~]=clk_gen_f_not_id5(freq,0,vector_length,0,vector_length2,1);
-    clk=clk(floor(t_clk/2)+2:length(clk));
+    clk=clk(t_clk/2+mod(round(rand()*100),10)-5:length(clk));
     driv_data = driv_script(input_data,clk);
     UI_probes=1/(t_clk*freq);
     channel_data = channel(driv_data);
@@ -149,19 +164,28 @@ eq_dat=ctle(channel_data, 2.5e9, 12); % (signal, fz, gain)
     set_peak_value=0;
     
  %% data transfer   
-    input_bytes=1500;
+    input_bytes=1000;
     vector_length=250*input_bytes;
     input_data=generate_binary_data(input_bytes, 'none');
     input_bits=numel(input_data);
     [clk,t_clk,~,~,~]=clk_gen_f_not_id5(freq,0,vector_length,0,vector_length2,1);
-    clk=clk(floor(t_clk/2)+3:length(clk));
+    clk=clk(t_clk/2+mod(round(rand()*100),10)-5:length(clk));
     driv_data = driv_script(input_data,clk);
     UI_probes=1/(t_clk*freq);
     channel_data = channel(driv_data);
 
     eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
     [data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco2,clk1_out,f_vco_end,v_int_end,1,0);
-   
+
+    f_clks=freq_check(clk);
+    figure
+    plot(f_clks(2:length(f_clks)))
+    ylabel('cz. zegara taktujacego dane');
+    
+    f_vcos=freq_check(clk_vco);
+    figure
+    plot(f_vcos(2:length(f_vcos)))
+    ylabel('cz. zegara vco');
     
     
 error=0;
