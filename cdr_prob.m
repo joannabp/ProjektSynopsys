@@ -26,10 +26,11 @@ global PVCO;
 global Temp;
 global TJ;
 global F;
+global RJ0;
 Temp=300;
 F=1;
 PVCO=100;
-TJ=Temp*F/PVCO*1e-3;
+TJ=Temp*F/PVCO*RJ0;
 
 
 PJ_prev=PJ_tot;
@@ -77,9 +78,9 @@ kps=ones(1,vector_length2);
 % if(ph_det_mode==1)
 %     kps=kps*64;
 % end
-% if(kp_start~=-1)
-%     kps(1)=kp_start;
-% end
+if(kp_start~=-1)
+    kps(1)=kp_start;
+end
 
 %-----------------------%---------------------------------%----------------
  % --------------data recovery--------------------------%
