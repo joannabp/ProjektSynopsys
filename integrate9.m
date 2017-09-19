@@ -9,13 +9,13 @@ function [v_int,v_int_ret,kp,z]=integrate9(v_df,v_int_prev,kp,ki,z,ph_det_mode)
       elseif(v_int_num<v_int_prev&&z>-10)
           z=z-1;
       end
-       if(z*(v_int_num-v_int_prev)<0&&kp>1)
+      if(z*(v_int_num-v_int_prev)<0&&kp>1)
           z=0;
           kp=kp/2;
-       elseif(abs(z)>=10&&kp<64)
+      elseif(abs(z)>=10&&kp<64)
           kp=kp*2;
           z=0;
-       end
+      end
 %   %end
   if(v_int_num>2^(acc_size))
       v_int_num=2^(acc_size);

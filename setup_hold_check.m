@@ -161,6 +161,13 @@ k=1;
 
 for i=1:j 
     
+% if(setup200<0 || hold200<0)
+%           data(2)=1;
+%           data(1)=randi([0 1], 1, 1);
+%       else
+%           data(1:2)=prev_val;
+%       end
+
      if(setup200<0 || hold200<0 || setup0<0 || hold0<0 || setup_200<0 || hold_200<0)
        %  data(1:2)=unres;
        %data(1:2)=0;
