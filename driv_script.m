@@ -55,8 +55,7 @@ while k<numel(pam4)
    
    i=i+1;
 end
-
-
+i
 driv_data=driv_data(1:i);
 
 
