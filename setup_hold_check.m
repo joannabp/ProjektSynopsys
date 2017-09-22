@@ -122,7 +122,7 @@ for i=2:vector_length
     end
       
     % ------------------- check hold -200 time ------------% ---- 
-        if(j==2)
+      if(j==2)
 
         if (abs(input_vector(i)-th_200(j))>min_eye_opening/2)
             hold_200=hold_200+1;
@@ -168,10 +168,23 @@ for i=1:j
 %           data(1:2)=prev_val;
 %       end
 
+
      if(setup200<0 || hold200<0 || setup0<0 || hold0<0 || setup_200<0 || hold_200<0)
+             
+            if(setup200<0 || hold200<0)
+                      data(2)=1;
+                      data(1)=randi([0 1], 1, 1);
+            elseif (setup_200<0 || hold_200<0)
+                data(2)=0;
+                data(1)=randi([0 1], 1, 1);
+            else
+                data(1:2)=prev_val;
+            end
+
+         
        %  data(1:2)=unres;
        %data(1:2)=0;
-      data(1:2)=prev_val;
+      %data(1:2)=prev_val;
      end
      k=k+2;
       %prev_val(1:2)=data(1:2);
