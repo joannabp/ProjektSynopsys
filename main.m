@@ -15,11 +15,11 @@ global T_mid;
 global T;
 
 dlugosc_kanalu = 10;
-input_bytes=1000;   % number of input bytes for clk sync
+input_bytes=2000;   % number of input bytes for clk sync
 input_bits=input_bytes*8;
 
 freq_mid = 10e9;     % 10GHz
-freq=9.99e9;
+freq=10.05e9;
 T_mid = 1/freq_mid;       % 0.1ns
 T = 1/freq;       % 0.1ns
 UI_probes_mid=T_mid/50;
@@ -43,7 +43,7 @@ global fp2;
 
 ctle_adapt=0;
 set_peak_value=0;
-peak_val=60;
+%peak_val=60;
 fp1=9.8e9;
 fp2=15.9e10;
 unres_val=-1; % -1/ 'prev'
@@ -71,10 +71,11 @@ PJ_tot=0; %zmienna akumulacyjna PJ, po freq/f_PJ zmienia kierunek zmian okresu
 BER=1e-12;
 peak_jit=[3.891 4.417 4.892 5.327 5.731 6.109 6.467 6.807 7.131 7.441 7.739];
 peak_jit=peak_jit(log10(1e-3/BER));
-RJ0=0;
+RJ0=0;%1e-3;
 
 thr=0.5;
 vector_length=250*input_bytes;
+vector_length2=round(vector_length*UI_probes_mid*4/T);
 t0=[54,52,50,48,46];
 f0=zeros(1,5);
 
@@ -86,7 +87,6 @@ end
 
 input_data=generate_binary_data(input_bytes, 'pulses');
 input_bits=numel(input_data);
-vector_length2=round(vector_length*UI_probes_mid*4/T);
 %clk_ideal=clk_ideal_gen(input_bits,over_sampling);
 %time = (0:T/over_sampling:T*input_bits-(T/over_sampling));
 
@@ -94,11 +94,11 @@ vector_length2=round(vector_length*UI_probes_mid*4/T);
 %---------------------Driver----------------------------------------------%
 [clk,t_clk,~,~,~]=clk_gen_f_not_id5(freq,0,vector_length,0,vector_length2,1);
 clk=clk(t_clk/2+mod(round(rand()*100),10)-5:length(clk));
-% f_clks=freq_check(clk);
-% figure
-% plot(f_clks(2:length(f_clks)))
-% ylabel('cz. zegara sekwencji synchronizujacej');
+
+prev_set=8;
+[~,fz,gain,peak_val]=ctle_set(prev_set)
 driv_data = driv_script(input_data,clk);
+clk=clk(length(driv_data):length(clk));
 UI_probes=1/(t_clk*freq);
 setup_t=5*UI_probes; % 
 hold_t=5*UI_probes; % 
@@ -110,77 +110,84 @@ hold_t=5*UI_probes; %
 channel_data = channel(driv_data);
 % eq_dat=ctle_back(channel_data, 5e8, 6e9, 12e9, 0, -10); % (signal, fz, fp1,
  %fp2, HFboost, DCgain)
-%eq_dat=ctle(channel_data, 1.5e9, 12); % (signal, fz, gain)
-eq_dat=ctle(channel_data, 2.5e9, 12); % (signal, fz, gain)
+eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
+%eq_dat=ctle(channel_data, 1e9, 12); % (signal, fz, gain)
 
 %save('pulses_20kB_10G_3_2_5e9all.mat');
 
 %% cdr
 
 %% clock_synchro-------------------------------------------------------%%
-[data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,-1,0,1*freq_mid,-1,-1,1);
+[data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,-1,0,0,1*freq_mid,-1,-1,1);
 
 %% ctle adapt
 %close all;
-o=0;
-    input_bytes=50;
-    peak_val=80;
+    input_bytes=250;
+    %peak_val=80;
     vector_length=250*input_bytes;
+    clk=clk_make(clk,t_clk);
+    ylabel('zegar drivera przy ctle');
+    f_clks=freq_check(clk);
+    figure
+    plot(f_clks(2:length(f_clks)))
+    ylabel('cz. zegara ctle');
     input_data=generate_binary_data(input_bytes, 'pulses_&&_ctle');
     input_bits=numel(input_data);
-    clk2=clk;
-    [clk,t_clk,~,~,~]=clk_gen_f_not_id5(freq,0,vector_length,0,vector_length2,1);
-    clk=clk(t_clk/2+2:length(clk));%+mod(round(rand()*100),10)-5
     driv_data = driv_script(input_data,clk);
+    clk=clk(length(driv_data):length(clk));
     UI_probes=1/(t_clk*freq);
     channel_data = channel(driv_data);
-    prev_set=5;
-    [cur_set, fz, gain]=ctle_set(prev_set);
+    [cur_set, fz, gain, peak_val]=ctle_set(prev_set);
     eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
-    [data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk1_out,f_vco_end,v_int_end,kp_end,2);
-
-    while (ctle_adapt~=0 || o>4)
-        o=o+1;
+    [data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,2);
+   r=0;
+    while (ctle_adapt~=0 && r<12)
         %close all
+        r=r+1;
         prev_set=cur_set;
-        [cur_set, fz, gain]=ctle_set(prev_set);
+        [cur_set, fz, gain, peak_val]=ctle_set(prev_set);
         eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)   
         fprintf('curset %d', cur_set);
-        [data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk1_out,f_vco_end,v_int_end,kp_end,3);
+        [data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,3);
     end
 
     %% dfe peak adapt
     set_peak_value=1;
-    peak_val=40;
+%    peak_val=60;
     input_bytes=500;
     vector_length=250*input_bytes;
+    clk=clk_make(clk,t_clk);
+    ylabel('zegar drivera przy dfe');
+    f_clks=freq_check(clk);
+    figure
+    plot(f_clks(2:length(f_clks)))
+    ylabel('cz. zegara dfe');
     %close all;
     input_data=generate_binary_data(input_bytes, 'dfe_pulses');
     input_bits=numel(input_data);
-    clk=clk2;
-%     [clk,t_clk,~,~,~]=clk_gen_f_not_id5(freq,0,vector_length,0,vector_length2,1);
-%     clk=clk(t_clk/2+mod(round(rand()*100),10)-5:length(clk));
     driv_data = driv_script(input_data,clk);
+    clk=clk(length(driv_data):length(clk));
     UI_probes=1/(t_clk*freq);
     channel_data = channel(driv_data);
   
     eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
-    [data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk1_out,f_vco_end,v_int_end,kp_end,4);
+    [data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,4);
     set_peak_value=0;
     
  %% data transfer   
     input_bytes=1000;
     vector_length=250*input_bytes;
+    clk=clk_make(clk,t_clk);
+    ylabel('zegar drivera przy danych');
     input_data=generate_binary_data(input_bytes, 'none');
     input_bits=numel(input_data);
-%     [clk,t_clk,~,~,~]=clk_gen_f_not_id5(freq,0,vector_length,0,vector_length2,1);
-%     clk=clk(t_clk/2+mod(round(rand()*100),10)-5:length(clk));
     driv_data = driv_script(input_data,clk);
     UI_probes=1/(t_clk*freq);
     channel_data = channel(driv_data);
 
     eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
-    [data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,0);
+    [data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,0);
+    
     if(vector_length<length(clk))
         f_clks=freq_check(clk(1:vector_length));
     else
@@ -248,4 +255,17 @@ plot(data)
 ylabel('data recovered');
 % setup=setup';
 % holdd=holdd';
-
+% 
+% sl=zeros(1,vector_length2);
+% sl(1)=slope(clk(1:vector_length2));
+% for z=2:vector_length2
+%     sl(z)=slope(clk(sl(z-1):vector_length2));
+%     if(sl(z)==0)
+%         break;
+%     end
+% end
+%
+% figure
+% % data_c=data_c(3:length(data_c));
+% x=abs(data(1:length(data_c))-data_c);
+% plot(x)

@@ -1,5 +1,5 @@
 
-function  [out_data, slope_sampled, min_eye300_100, min_eye100_100,min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_o,clk1,f_vco_end,v_int_end,kp_end]=cdr_prob(input_vector,clk_start,clk1,f_vco_start,v_int_start,kp_start,ph_det_mode)
+function  [out_data, slope_sampled, min_eye300_100, min_eye100_100,min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_o,clk_o2,clk1,f_vco_end,v_int_end,kp_end]=cdr_prob(input_vector,clk_start,clk_start2,clk1,f_vco_start,v_int_start,kp_start,ph_det_mode)
 
 
 global input_bits;
@@ -56,18 +56,19 @@ t_clk1(1)=round(T_mid/UI_probes_mid*freq_mid/f_vco_start);
 t_clk2(1)=round(T_mid/UI_probes_mid*freq_mid/f_vco_start);
 
 if(clk_start==-1)
-    delay=3;
+    delay=10;
     [clk,~,~,clk1,curr_end_vco]=clk_gen_f_not_id5(f_vcos(1),0,vector_length,clk1,delay,0);
     fprintf('startowy zegar wyjsciowy wygenerowany do %d\n',curr_end_vco);
     f_vcos(2:delay)=f_vco_start;
+    clk2=clk(t_clk1(1)/2+1:curr_end_vco);
     %t_vcos(2:delay)=T_mid/UI_probes_mid*freq_mid/f_vco_start;
     %clk=clk(floor(t_clk1(1)/4):curr_end_vco);
     %curr_end_vco=curr_end_vco-11;
 else
     clk=clk_start;
     curr_end_vco=length(clk);
+    clk2=clk_start2;
 end
-clk2=clk(t_clk1(1)/2+1:curr_end_vco);
 v_int_num=zeros(1,vector_length);                                %numeryczna wartosc napiecia wyjsciowego integratora
 if(v_int_start~=-1)
     v_int_num(1)=v_int_start;
@@ -198,9 +199,12 @@ PJ_tot=PJ_prev;
 %fprintf('zegar wyjsciowy od %d do %d, przesuniecie %d\n',(sl1(j-1)+ceil(t_clk1/4)+x),curr_end_vco,(ceil(t_clk1/4)+x));
 if(ph_det_mode~=0)
     %clk_o=clk(sl1(j-1)+ceil(t_clk1/4)+x:curr_end_vco);
-    clk_o=clk(sl1(j-1):curr_end_vco);
+    sl_end=slope_fall(clk(sl1(j-1):curr_end_vco))+sl1(j-1);
+    clk_o=clk(sl_end:curr_end_vco);
+    clk_o2=clk2(sl2(j-1)-1:length(clk2));
 else
     clk_o=clk;
+    clk_o2=clk2;
 end
 %clk_o=clk(sl1(j-1):curr_end_vco);
 f_vco_end=f_vcos(j-1);

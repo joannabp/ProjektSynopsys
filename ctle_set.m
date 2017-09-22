@@ -24,50 +24,50 @@ switch cur_set
         %ctle=ctle(3, 5.5e9,12); % (signal, fz, gain)
         fz=5.5e9;
         gain=12;
-        peak_val=155;
+        peak_val=140;
     case 2     
         %ctle=ctle(3, 2e9, 12); % (signal, fz, gain)
         fz=4.5e9;
         gain=12;
-        peak_val=130;
+        peak_val=120;
     case 3
         %ctle=ctle(3, 3.5e9, 12); % (signal, fz, gain)
         fz=3.5e9;
         gain=12;
-        peak_val=120;
+        peak_val=110;
     case 4
         fz=3e9;
         gain=12;
-        peak_val=110;
+        peak_val=100;
     case 5
         fz=2.5e9;
         gain=12;
-        peak_val=100;
+        peak_val=90;
     case 6
         fz=2e9;
         gain=12;
-        peak_val=90;
+        peak_val=75;
     case 7 % start set
         fz=1.5e9;
         gain=12;
-        peak_val=85;
+        peak_val=65;
     case 8
         fz=1.2e9;
         gain=12;
-        peak_val=80;
+        peak_val=55;
         
     case 9
         fz=1e9;
         gain=12;
-        peak_val=80;
+        peak_val=55;
     case 10
         fz=0.7e9;
         gain=12;
-        peak_val=75;
+        peak_val=50;
     case 11
         fz=0.4e9;
         gain=12;
-        peak_val=75;
+        peak_val=45;
 end
         
 %ctle=ctle(3, 1.2e9, 12); % (signal, fz, gain)
