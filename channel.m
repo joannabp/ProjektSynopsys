@@ -14,7 +14,7 @@ L=Lp*d;
 
 %syms s
 
-w = logspace(0,20,32);
+w = logspace(0,13,64);
 % 
  b=[1];
  a=[1  R*C*i*w]
@@ -39,7 +39,7 @@ ylabel('Magnitude (dB)')
 
 subplot(2,1,2)
 semilogx(w, 180/pi * unwrap(angle(H)))
-xlabel('Frequency (Hz)'), ylabel('Phase (degrees)')
+xlabel('w (rad/s)'), ylabel('Phase (degrees)')
 
 %c=tf(a, b);
 %H=freqs(b, a, w);

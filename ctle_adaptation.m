@@ -1,7 +1,9 @@
 function ctle_s=ctle_adaptation(data, slopes)
 global ctle_adapt;
+global ctle_count;
 ctle_s=0;
 if (data==[0 1 0 1 1 0 0 1])% || data==[1;1;0;1])
+    ctle_count=ctle_count+1;
     fprintf('slopes');
     slopes
     fprintf(' data ');
