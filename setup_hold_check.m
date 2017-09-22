@@ -77,7 +77,7 @@ j=1;
 % ------------------- check setup -200 time ------------% ---- 
 
 for i=2:vector_length
-   
+   if(j==1)
     if (abs(input_vector(i)-th_200(j))>min_eye_opening/2)
         setup_200=setup_200+1;
     else 
@@ -99,7 +99,7 @@ for i=2:vector_length
     else 
         setup200=1;
     end
-    
+   end 
   
     
     if(rising_edge_detector(i)==1)
@@ -122,24 +122,24 @@ for i=2:vector_length
     end
       
     % ------------------- check hold -200 time ------------% ---- 
+        if(j==2)
 
-   
-    if (abs(input_vector(i)-th_200(j))>min_eye_opening/2)
-        hold_200=hold_200+1;
-    end
-% ------------------- check hold 0 time ------------% ---- 
+        if (abs(input_vector(i)-th_200(j))>min_eye_opening/2)
+            hold_200=hold_200+1;
+        end
+    % ------------------- check hold 0 time ------------% ---- 
 
-   
-    if (abs(input_vector(i)-th0(j))>min_eye_opening/2)
-        hold0=hold0+1;
-    else 
-        hold0=1;
-    end
-% ------------------- check hold -200 time ------------% ----
 
-   
-    if (abs(input_vector(i)-th200(j))>min_eye_opening/2)
-        hold200=hold200+1;
+        if (abs(input_vector(i)-th0(j))>min_eye_opening/2)
+            hold0=hold0+1;
+
+        end
+    % ------------------- check hold -200 time ------------% ----
+
+
+        if (abs(input_vector(i)-th200(j))>min_eye_opening/2)
+            hold200=hold200+1;
+        end
     end
 end
 
