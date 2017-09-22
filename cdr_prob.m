@@ -67,7 +67,7 @@ else
     clk=clk_start;
     curr_end_vco=length(clk);
 end
-clk2=clk(t_clk1(1)/2+2:curr_end_vco);
+clk2=clk(t_clk1(1)/2+1:curr_end_vco);
 v_int_num=zeros(1,vector_length);                                %numeryczna wartosc napiecia wyjsciowego integratora
 if(v_int_start~=-1)
     v_int_num(1)=v_int_start;
@@ -194,10 +194,11 @@ while ((i<length(input_vector)-100) &&end_pll==0)%&&j<50)
         
 end
 PJ_tot=PJ_prev;
-x=mod(round(rand()*100),10)-5;
+%x=mod(round(rand()*100),10)-5;
 %fprintf('zegar wyjsciowy od %d do %d, przesuniecie %d\n',(sl1(j-1)+ceil(t_clk1/4)+x),curr_end_vco,(ceil(t_clk1/4)+x));
 if(ph_det_mode~=0)
-    clk_o=clk(sl1(j-1)+ceil(t_clk1/4)+x:curr_end_vco);
+    %clk_o=clk(sl1(j-1)+ceil(t_clk1/4)+x:curr_end_vco);
+    clk_o=clk(sl1(j-1):curr_end_vco);
 else
     clk_o=clk;
 end
