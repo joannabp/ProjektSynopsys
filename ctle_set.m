@@ -13,7 +13,7 @@ global ctle_adapt;
 max_set=11;
 min_set=1;
 
-if(prev_set<max_set && prev_set>min_set)
+if(prev_set+ctle_adapt<=max_set && prev_set+ctle_adapt>=min_set)
     cur_set=prev_set+ctle_adapt;
 else
     cur_set=prev_set;
