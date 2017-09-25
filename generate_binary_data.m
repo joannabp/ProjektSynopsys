@@ -22,12 +22,12 @@ elseif strcmp(training_seq,'none')
     end
 elseif strcmp(training_seq,'pulses_&&_ctle')
     seq=[0; 1;  0; 1; 1; 0; 0; 1;];
-   
+ seq2=[1; 0;  1; 0; 0; 1; 1; 0;];
         for i=1:input_bytes
             if(mod(i, 25)==0)
                 input_data(:,i)=seq;
             elseif (mod(i, 15)==0)
-                 input_data(:,i) = [0; 1;  1; 0; 1; 0; 0; 1;];
+                 input_data(:,i) = seq2;
             else
                 input_data(:,i) = [1; 0;  1; 0; 1; 0; 1; 0;];
 %             else
