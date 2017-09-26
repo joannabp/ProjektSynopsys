@@ -1,5 +1,5 @@
 
-function  [out_data, slope_sampled, min_eye300_100, min_eye100_100,min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_o,clk_o2,clk1,f_vco_end,v_int_end,kp_end]=cdr_prob(input_vector,clk_start,clk_start2,clk1,f_vco_start,v_int_start,kp_start,ph_det_mode)
+function  [out_data, slope_sampled,setup_200, setup0, setup200, hold_200, hold0, hold200, wf,clk_o,clk_o2,clk1,f_vco_end,v_int_end,kp_end]=cdr_prob(input_vector,clk_start,clk_start2,clk1,f_vco_start,v_int_start,kp_start,ph_det_mode)
 
 
 global input_bits;
@@ -94,18 +94,14 @@ t=1;
 k=1;
 out_data=zeros(1,input_bits);
 slope_sampled=zeros(1,input_bits);
-min_eye300_100=zeros(1,input_bits);  
-min_eye100_100=zeros(1,input_bits);
-min_eye100_300=zeros(1,input_bits);
+
 setup_200=zeros(1,input_bits);
 setup0=zeros(1,input_bits);
 setup200=zeros(1,input_bits);
 hold_200=zeros(1,input_bits);
 hold0=zeros(1,input_bits);
 hold200=zeros(1,input_bits);
-eyeO1=zeros(1,input_bits);
-eyeO2=zeros(1,input_bits);
-eyeO3=zeros(1,input_bits);
+
 sl1=zeros(1,vector_length2);
 sl2=zeros(1,vector_length2);
 th200_k= [20; 0];
@@ -136,10 +132,10 @@ while ((i<length(input_vector)-100) &&end_pll==0)%&&j<50)
     i
     fprintf('t vco: %d \n',t_clk1(j));
     fprintf('pobierany clk od %d do %d\n',i,i+t_clk1(j));
-    [data, ~, min_eye300_100_tmp, min_eye100_100_tmp, min_eye100_300_tmp,setup_200_tmp, setup0_tmp, setup200_tmp, hold_200_tmp, hold0_tmp, hold200_tmp, eyeO1_tmp, eyeO2_tmp, eyeO3_tmp, wf, th200_k, scaled_th_dat, sample]=data_recovery(input_vector(i:i+t_clk1(j)), clk(i:i+t_clk1(j)), clk(i:i+t_clk1(j)), wf, th200_k, scaled_th_dat, sample);
+    [data, ~, setup_200_tmp, setup0_tmp, setup200_tmp, hold_200_tmp, hold0_tmp, hold200_tmp, wf, th200_k, scaled_th_dat, sample]=data_recovery(input_vector(i:i+t_clk1(j)), clk(i:i+t_clk1(j)), clk(i:i+t_clk1(j)), wf, th200_k, scaled_th_dat, sample);
     
     fprintf('pobierany clk2 od %d do %d\n',i+floor(t_clk2(j)/2),i+floor(3/2*t_clk2(j)));
-    [~, slp, ~, ~, ~,~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~, ~]=data_recovery(input_vector(i+floor(t_clk2(j)/2):i+floor(3/2*t_clk2(j))), clk2(i:i+t_clk2(j)), clk2(i+floor(t_clk2(j)/2):i+floor(3/2*t_clk2(j))), wf, th200_k, scaled_th_dat, sample);
+    [~, slp, ~, ~, ~,~, ~, ~, ~, ~, ~, ~]=data_recovery(input_vector(i+floor(t_clk2(j)/2):i+floor(3/2*t_clk2(j))), clk2(i:i+t_clk2(j)), clk2(i+floor(t_clk2(j)/2):i+floor(3/2*t_clk2(j))), wf, th200_k, scaled_th_dat, sample);
     
     %---- set peak_val --------%
     if(set_peak_value==1 && j>5 && (isequal(out_data(k-6:k-1),[0 1 0 1 0 1])))
@@ -157,19 +153,14 @@ while ((i<length(input_vector)-100) &&end_pll==0)%&&j<50)
     out_data(k: k+1)=data; 
     slope_sampled(j)=slp;
     
-%     min_eye300_100(t)=min_eye300_100_tmp;
-%     
-%     min_eye100_100(t)=min_eye100_100_tmp;
-%     min_eye100_300(t)=min_eye100_300_tmp;
+
     setup_200(t)=setup_200_tmp;
     setup0(t)=setup0_tmp;
     setup200(t)=setup200_tmp;
     hold_200(t)=hold_200_tmp;
     hold0(t)=hold0_tmp;
     hold200(t)=hold200_tmp;
-%     eyeO1(t)=eyeO1_tmp;
-%     eyeO2(t)=eyeO2_tmp;
-%     eyeO3(t)=eyeO3_tmp;
+
     
     i=i+t_clk1(j);
     t=t+1;

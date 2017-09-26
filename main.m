@@ -15,11 +15,11 @@ global T_mid;
 global T;
 
 dlugosc_kanalu = 10;
-input_bytes=4500;   % number of input bytes for clk sync
+input_bytes=10000;   % number of input bytes for clk sync
 input_bits=input_bytes*8;
 
 freq_mid = 10e9;     % 10GHz
-freq=9.95e9;
+freq=10.1e9;
 T_mid = 1/freq_mid;       % 0.1ns
 T = 1/freq;       % 0.1ns
 UI_probes_mid=T_mid/50;
@@ -98,7 +98,7 @@ clk=clk(t_clk/2+mod(round(rand()*100),10)-5:length(clk));
 driv_data = driv_script(input_data,clk);
 clk=clk(length(driv_data):length(clk));
 UI_probes=1/(t_clk*freq);
-setup_t=2*UI_probes; % 
+setup_t=5*UI_probes; % 
 hold_t=5*UI_probes; % 
 %vector_length=length(driv_data);
 
@@ -119,13 +119,13 @@ eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
 %% cdr
 
 %% clock_synchro-------------------------------------------------------%%
-[data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,-1,0,0,1*freq_mid,-1,-1,1);
+[data, slope_sampled, setup_200, setup0, setup200, hold_200, hold0, hold200, wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,-1,0,0,1*freq_mid,-1,-1,1);
 
 %% ctle adapt
 %close all;
-    input_bytes=250;
+    input_bytes=500;
     %peak_val=80;
-    vector_length=250*input_bytes;
+    vector_length=500*input_bytes;
     clk=clk_make(clk,t_clk);
     ylabel('zegar drivera przy ctle');
     f_clks=freq_check(clk);
@@ -139,16 +139,16 @@ eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
     UI_probes=1/(t_clk*freq);
     channel_data = channel(driv_data);
     eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
-    [data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,2);
+    [data, slope_sampled, setup_200, setup0, setup200, hold_200, hold0, hold200, wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,2);
    r=0;
-    while (ctle_adapt~=0 && r<9)
+    while (ctle_adapt~=0)
         %close all
         r=r+1;
         prev_set=cur_set;
         [cur_set, fz, gain, peak_val]=ctle_set(prev_set);
         eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)   
         fprintf('curset %d', cur_set);
-        [data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,3);
+        [data, slope_sampled,setup_200, setup0, setup200, hold_200, hold0, hold200, wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,3);
     end
 
     %% dfe peak adapt
@@ -171,7 +171,7 @@ eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
     channel_data = channel(driv_data);
   
     eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
-    [data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,4);
+    [data, slope_sampled,setup_200, setup0, setup200, hold_200, hold0, hold200, wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,4);
     set_peak_value=0;
     
  %% data transfer   
@@ -186,7 +186,7 @@ eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
     channel_data = channel(driv_data);
 
     eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
-    [data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300,setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,0);
+    [data, slope_sampled, setup_200, setup0, setup200, hold_200, hold0, hold200,  wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,0);
     
     if(vector_length<length(clk))
         f_clks=freq_check(clk(1:vector_length));

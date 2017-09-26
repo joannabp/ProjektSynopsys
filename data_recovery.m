@@ -1,4 +1,4 @@
-function [out_data, slope_sampled, min_eye300_100, min_eye100_100, min_eye100_300, setup_200, setup0, setup200, hold_200, hold0, hold200, eyeO1, eyeO2, eyeO3, wf, th200_k, scaled_th_dat, sample]=data_recovery(input_vector, clk, clk_shf, wf, th200_k, scaled_th_dat, sample)
+function [out_data, slope_sampled, setup_200, setup0, setup200, hold_200, hold0, hold200, wf, th200_k, scaled_th_dat, sample]=data_recovery(input_vector, clk, clk_shf, wf, th200_k, scaled_th_dat, sample)
 
 
 global thr;
@@ -24,7 +24,7 @@ rising_edge_detector_shf=[0 diff(rising_edge_detector_shf)>0]>0;
 %eq_data=ctle(input_vector);
 [setup_200, setup0, setup200, hold_200, hold0, hold200, out_data]=setup_hold_check(input_vector, clk, rising_edge_detector, th0, th_200, th200, out_data); 
 
-[min_eye300_100, min_eye100_100, min_eye100_300, eyeO1, eyeO2, eyeO3]=eye_values(input_vector, rising_edge_detector);
+;
 
 %wf=coeffs(1:3);
 %th200_k=coeffs(4:5);
