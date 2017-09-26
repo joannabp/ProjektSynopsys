@@ -15,11 +15,11 @@ global T_mid;
 global T;
 
 dlugosc_kanalu = 10;
-input_bytes=3500;   % number of input bytes for clk sync
+input_bytes=4500;   % number of input bytes for clk sync
 input_bits=input_bytes*8;
 
 freq_mid = 10e9;     % 10GHz
-freq=10.05e9;
+freq=9.95e9;
 T_mid = 1/freq_mid;       % 0.1ns
 T = 1/freq;       % 0.1ns
 UI_probes_mid=T_mid/50;
@@ -108,7 +108,7 @@ hold_t=5*UI_probes; %
 channel_data = channel(driv_data);
 % eq_dat=ctle_back(channel_data, 5e8, 6e9, 12e9, 0, -10); % (signal, fz, fp1,
  %fp2, HFboost, DCgain)
-prev_set=1;
+prev_set=3;
 [cur_set,fz,gain,peak_val]=ctle_set(prev_set)
 %peak_val=100;
 eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)

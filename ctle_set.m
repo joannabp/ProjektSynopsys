@@ -38,11 +38,11 @@ switch cur_set
     case 4
         fz=3e9;
         gain=12;
-        peak_val=100;
+        peak_val=90;
     case 5
         fz=2.5e9;
         gain=12;
-        peak_val=90;
+        peak_val=80;
     case 6
         fz=2e9;
         gain=12;
