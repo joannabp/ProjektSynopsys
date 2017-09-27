@@ -16,7 +16,7 @@ k=1;
 j=0;
 if(vector_length>l)
     while(slope_end+t_clk<=l&&slope(clk(slope_end:l))~=0)
-        slope_end=slope_end+t_clks(k)-1;
+        slope_end=slope_end+slope(clk(slope_end:l))-1;
         k=k+1;
     end
     slope_end_fall=slope_fall(clk(slope_end:l))+slope_end;
