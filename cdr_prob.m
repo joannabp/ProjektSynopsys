@@ -27,6 +27,7 @@ global Temp;
 global TJ;
 global F;
 global RJ0;
+global zmax;
 Temp=300;
 F=1;
 PVCO=100;
@@ -51,12 +52,12 @@ f_vcos(1)=f_vco_start;
 %t_vcos=zeros(1,vector_length2);
 %t_vcos(1)=T_mid/UI_probes_mid*freq_mid/f_vco_start;
 t_clk1=zeros(1,vector_length2);
-t_clk2=zeros(1,vector_length2);
-t_clk1(1)=round(T_mid/UI_probes_mid*freq_mid/f_vco_start);
-t_clk2(1)=round(T_mid/UI_probes_mid*freq_mid/f_vco_start);
+%t_clk2=zeros(1,vector_length2);
+t_clk1(1:2)=round(T_mid/UI_probes_mid*freq_mid/f_vco_start);
+%t_clk2(1:2)=round(T_mid/UI_probes_mid*freq_mid/f_vco_start);
 
 if(clk_start==-1)
-    delay=10;
+    delay=3;
     [clk,~,~,clk1,curr_end_vco]=clk_gen_f_not_id5(f_vcos(1),0,vector_length,clk1,delay,0);
     fprintf('startowy zegar wyjsciowy wygenerowany do %d\n',curr_end_vco);
     f_vcos(2:delay)=f_vco_start;
@@ -121,22 +122,25 @@ while ((i<length(input_vector)-100) &&end_pll==0)%&&j<50)
     end
     fprintf('petla cdr \n');
     %clk2(i:i+t_vcos(j))=clk(i+round(t_vcos(j)/2):i+round(3/2*t_vcos(j)));
-    sl1(j)=slope(clk(i:length(clk)));
-    sl2(j)=slope(clk2(i:length(clk2)));
     if(j>1)
-        sl1(j)=sl1(j)+i;
-        sl2(j)=sl2(j)+i;
+        sl1(j)=slope(clk(sl1(j-1)+1:length(clk)))-1;
+        sl2(j)=slope(clk2(sl2(j-1)+1:length(clk2)))-1;
+        sl1(j)=sl1(j)+sl1(j-1);
+        sl2(j)=sl2(j)+sl2(j-1);
         t_clk1(j)=sl1(j)-sl1(j-1);
-        t_clk2(j)=sl2(j)-sl2(j-1);
+        t_clk1(j+1)=sl2(j)-sl2(j-1);
+    else
+        sl1(j)=slope(clk(i:length(clk)))-1;
+        sl2(j)=slope(clk2(i:length(clk2)))-1;
     end
     i
     fprintf('t vco: %d \n',t_clk1(j));
     fprintf('pobierany clk od %d do %d\n',i,i+t_clk1(j));
     [data, ~, setup_200_tmp, setup0_tmp, setup200_tmp, hold_200_tmp, hold0_tmp, hold200_tmp, wf, th200_k, scaled_th_dat, sample]=data_recovery(input_vector(i:i+t_clk1(j)), clk(i:i+t_clk1(j)), clk(i:i+t_clk1(j)), wf, th200_k, scaled_th_dat, sample);
-    
-    fprintf('pobierany clk2 od %d do %d\n',i+floor(t_clk2(j)/2),i+floor(3/2*t_clk2(j)));
-    [~, slp, ~, ~, ~,~, ~, ~, ~, ~, ~, ~]=data_recovery(input_vector(i+floor(t_clk2(j)/2):i+floor(3/2*t_clk2(j))), clk2(i:i+t_clk2(j)), clk2(i+floor(t_clk2(j)/2):i+floor(3/2*t_clk2(j))), wf, th200_k, scaled_th_dat, sample);
-    
+    i=i+floor(t_clk1(j)/2);
+    fprintf('pobierany clk2 od %d do %d\n',i,i+t_clk1(j+1));
+    [~, slp, ~, ~, ~,~, ~, ~, ~, ~, ~, ~]=data_recovery(input_vector(i:i+t_clk1(j+1)), clk2(i:i+t_clk1(j+1)), clk2(i:i+t_clk1(j+1)), wf, th200_k, scaled_th_dat, sample);
+    i=i-floor(t_clk1(j)/2);
     %---- set peak_val --------%
     if(set_peak_value==1 && j>5 && (isequal(out_data(k-6:k-1),[0 1 0 1 0 1])))
        [peak_val, peak_sampled]=set_peak_val(input_vector(i:i+t_clk1(j)), clk(i:i+t_clk1(j)), peak_val)
@@ -172,7 +176,6 @@ while ((i<length(input_vector)-100) &&end_pll==0)%&&j<50)
         [clk_o,clk,clk1,~,f_vcos(j+delay),curr_end_vco,v_int_num(j),kps(j+1),z,end_pll]=pll3(clk,clk1,curr_end_vco,v_int_num(j),data,0,slp,kps(j),z,ph_det_mode,j);
     end
     clk2=[clk2 clk_o];
-    
     %---------------------Ctle_adapt----------------------------------
     if(j>4 && ctle_val==0)
        fprintf('ctle_adapt \n');

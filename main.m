@@ -15,7 +15,7 @@ global T_mid;
 global T;
 
 dlugosc_kanalu = 10;
-input_bytes=10000;   % number of input bytes for clk sync
+input_bytes=4500;   % number of input bytes for clk sync
 input_bits=input_bytes*8;
 
 freq_mid = 10e9;     % 10GHz
@@ -24,12 +24,12 @@ T_mid = 1/freq_mid;       % 0.1ns
 T = 1/freq;       % 0.1ns
 UI_probes_mid=T_mid/50;
 
-% 10-10.02 GHz - <1kb
+% 9.98-10.02 GHz - <1kb
 %10.05 - 2kb
-%9.98 - 1kb
-%9.95 - 4kb
-%9.9 - 8kb
-%10.1 - 6-6.5 kb
+%9.95 - 3kb
+%9.9 - >=10kb
+%10.1 - 5 kb
+%10.2 - >10kb
 %------ data_rec ----- %%
 global setup_t;
 global hold_t;
@@ -98,7 +98,7 @@ clk=clk(t_clk/2+mod(round(rand()*100),10)-5:length(clk));
 driv_data = driv_script(input_data,clk);
 clk=clk(length(driv_data):length(clk));
 UI_probes=1/(t_clk*freq);
-setup_t=5*UI_probes; % 
+setup_t=2*UI_probes; % 
 hold_t=5*UI_probes; % 
 %vector_length=length(driv_data);
 
@@ -125,7 +125,7 @@ eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
 %close all;
     input_bytes=500;
     %peak_val=80;
-    vector_length=500*input_bytes;
+    vector_length=250*input_bytes;
     clk=clk_make(clk,t_clk);
     ylabel('zegar drivera przy ctle');
     f_clks=freq_check(clk);
@@ -141,7 +141,7 @@ eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
     eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
     [data, slope_sampled, setup_200, setup0, setup200, hold_200, hold0, hold200, wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,2);
    r=0;
-    while (ctle_adapt~=0)
+    while (ctle_adapt~=0&&r<8)
         %close all
         r=r+1;
         prev_set=cur_set;
