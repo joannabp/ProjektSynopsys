@@ -6,8 +6,13 @@ function [clk,t_clk,f_clk,clk1,curr_end]=clk_gen_f_not_id5(f_in,start,stop,clk1,
     global PJ_tot;
     global f_PJ;
     global TJ;
-    if(dr==1)
+    if(dr>=1)
         clk=zeros(1,stop-start);
+    end
+    if(abs(dr)==2)
+        shift=dr/abs(dr);
+    else
+        shift=0;
     end
     %t_clk=zeros(1,vector_length2);
     %f_clk=zeros(1,vector_length2);
@@ -23,7 +28,7 @@ function [clk,t_clk,f_clk,clk1,curr_end]=clk_gen_f_not_id5(f_in,start,stop,clk1,
     f_diff=f_diff/10^6
     t_clk=t0(j);
     f_clk=j;
-    while(curr<stop-start&&t<=vector_length2)%&&t<120)
+    while(curr<stop-start&&t<=vector_length2&&(t<=vector_length2||dr==1))
         %t
         if(dr==0)
             RJ=randn()*TJ;
@@ -42,24 +47,31 @@ function [clk,t_clk,f_clk,clk1,curr_end]=clk_gen_f_not_id5(f_in,start,stop,clk1,
         f_diff=f_in-f0(j);
         f_diff=f_diff/10^6;
 %         clk1=round((clk1+f_diff/(f0(j+1)-f0(j-1))*10^6*2)*10^3)/10^3+RJ;
-        if(f_in>f0(j))
-            clk1=round((clk1+f_diff/(f0(j+1)-f0(j))*10^6)*10^3)/10^3+RJ;
+        if(abs(dr)<2)
+            if(f_in>f0(j))
+                clk1=round((clk1+f_diff/(f0(j+1)-f0(j))*10^6)*10^3)/10^3+RJ;
+            else
+                clk1=round((clk1+f_diff/(f0(j)-f0(j-1))*10^6)*10^3)/10^3+RJ;
+            %if(dr==0)
+                %fprintf('clk1 wynosi: %d\n',clk1);
+            %end
+            end
         else
-            clk1=round((clk1+f_diff/(f0(j)-f0(j-1))*10^6)*10^3)/10^3+RJ;
-        %if(dr==0)
-            %fprintf('clk1 wynosi: %d\n',clk1);
-        %end
+            dr=1;
         end
-        if(clk1>=0.5)
-            shift=-1;
-            clk1=clk1-0.5;
-            %t_clk=t_clk-1;
-        elseif(clk1<0)
-            shift=1;
-            clk1=clk1+0.5;
-            %t_clk=t_clk+1;
-        else
+        if(t>1)
             shift=0;
+        end
+        while(clk1>=0.5||clk1<0)
+            if(clk1>=0.5)
+                shift=shift-1;
+                clk1=clk1-0.5;
+                %t_clk=t_clk-1;
+            elseif(clk1<0)
+                shift=shift+1;
+                clk1=clk1+0.5;
+                %t_clk=t_clk+1;
+            end
         end
 %         if(clk1>0.5)
 %             clk1=clk1-0.5;
