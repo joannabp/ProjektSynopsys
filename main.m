@@ -15,11 +15,11 @@ global T_mid;
 global T;
 
 dlugosc_kanalu = 10;
-input_bytes=4500;   % number of input bytes for clk sync
+input_bytes=500;   % number of input bytes for clk sync
 input_bits=input_bytes*8;
 
 freq_mid = 10e9;     % 10GHz
-freq=10.1e9;
+freq=10e9;
 T_mid = 1/freq_mid;       % 0.1ns
 T = 1/freq;       % 0.1ns
 UI_probes_mid=T_mid/50;
@@ -65,13 +65,13 @@ global f0;
 
 
 f_PJ=1e8; %czestotliwosc Periodic Jitter
-PJ=0;%2e-14; %jedno przesuniecie okresu w wyniku PJ
-PJ_tot=0; %zmienna akumulacyjna PJ, po freq/f_PJ zmienia kierunek zmian okresu
+PJ=2e-14; %jedno przesuniecie okresu w wyniku PJ
+PJ_tot=0; %zmienna akumulacyjna PJ, po osiagnieciu freq/f_PJ zmienia kierunek zmian okresu
 
 BER=1e-12;
 peak_jit=[3.891 4.417 4.892 5.327 5.731 6.109 6.467 6.807 7.131 7.441 7.739];
 peak_jit=peak_jit(log10(1e-3/BER));
-RJ0=0;%1e-3;
+RJ0=5e-3;
 
 thr=0.5;
 vector_length=250*input_bytes;
@@ -92,13 +92,13 @@ input_bits=numel(input_data);
 
 
 %---------------------Driver----------------------------------------------%
-[clk,t_clk,~,~,~]=clk_gen_f_not_id5(freq,0,vector_length,0,vector_length2,1);
+[clk,t_clk,f_clk]=clk_gen_f_not_id5(freq,0,vector_length,0,vector_length2,1);
 clk=clk(t_clk/2+mod(round(rand()*100),10)-5:length(clk));
 
 driv_data = driv_script(input_data,clk);
 clk=clk(length(driv_data):length(clk));
 UI_probes=1/(t_clk*freq);
-setup_t=2*UI_probes; % 
+setup_t=5*UI_probes; % 
 hold_t=5*UI_probes; % 
 %vector_length=length(driv_data);
 
@@ -108,7 +108,7 @@ hold_t=5*UI_probes; %
 channel_data = channel(driv_data);
 % eq_dat=ctle_back(channel_data, 5e8, 6e9, 12e9, 0, -10); % (signal, fz, fp1,
  %fp2, HFboost, DCgain)
-prev_set=3;
+prev_set=7;
 [cur_set,fz,gain,peak_val]=ctle_set(prev_set)
 %peak_val=100;
 eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
@@ -126,7 +126,7 @@ eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
     input_bytes=500;
     %peak_val=80;
     vector_length=250*input_bytes;
-    clk=clk_make(clk,t_clk);
+    [clk,f_clk]=clk_make(clk,t_clk,f_clk);
     ylabel('zegar drivera przy ctle');
     f_clks=freq_check(clk);
     figure
@@ -140,8 +140,8 @@ eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
     channel_data = channel(driv_data);
     eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
     [data, slope_sampled, setup_200, setup0, setup200, hold_200, hold0, hold200, wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,2);
-   r=0;
-    while (ctle_adapt~=0&&r<8)
+    r=0;
+    while (ctle_adapt~=0&&r<12)
         %close all
         r=r+1;
         prev_set=cur_set;
@@ -156,7 +156,7 @@ eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
 %    peak_val=60;
     input_bytes=500;
     vector_length=250*input_bytes;
-    clk=clk_make(clk,t_clk);
+    [clk,f_clk]=clk_make(clk,t_clk,f_clk);
     ylabel('zegar drivera przy dfe');
     f_clks=freq_check(clk);
     figure
@@ -177,7 +177,7 @@ eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
  %% data transfer   
     input_bytes=1000;
     vector_length=250*input_bytes;
-    clk=clk_make(clk,t_clk);
+    [clk,f_clk]=clk_make(clk,t_clk,f_clk);
     ylabel('zegar drivera przy danych');
     input_data=generate_binary_data(input_bytes, 'none');
     input_bits=numel(input_data);

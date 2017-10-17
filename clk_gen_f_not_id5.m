@@ -1,4 +1,4 @@
-function [clk,t_clk,f_clk,clk1,curr_end]=clk_gen_f_not_id5(f_in,start,stop,clk1,vector_length2, dr)
+function [clk,t_clk,f_clk,clk1,curr_end, PJ_total]=clk_gen_f_not_id5(f_in,start,stop,clk1,vector_length2, dr)
     global t0;
     global f0;
     global peak_jit;
@@ -6,6 +6,7 @@ function [clk,t_clk,f_clk,clk1,curr_end]=clk_gen_f_not_id5(f_in,start,stop,clk1,
     global PJ_tot;
     global f_PJ;
     global TJ;
+    PJ_total=zeros(1,vector_length2);
     if(dr>=1)
         clk=zeros(1,stop-start);
     end
@@ -25,10 +26,8 @@ function [clk,t_clk,f_clk,clk1,curr_end]=clk_gen_f_not_id5(f_in,start,stop,clk1,
         j=j+1;
         f_diff=f_in-f0(j);
     end
-    f_diff=f_diff/10^6
     t_clk=t0(j);
-    f_clk=j;
-    while(curr<stop-start&&t<=vector_length2&&(t<=vector_length2||dr==1))
+    while(curr<stop-start&&(t<=vector_length2||dr==1))
         %t
         if(dr==0)
             RJ=randn()*TJ;
@@ -41,6 +40,7 @@ function [clk,t_clk,f_clk,clk1,curr_end]=clk_gen_f_not_id5(f_in,start,stop,clk1,
         end
         f_in=f_in/(1+PJ*f_PJ);
         PJ_tot=PJ_tot+PJ*f_PJ/f_in;
+        PJ_total(t)=PJ_tot;
         if(abs(PJ_tot)>abs(PJ))
             PJ=-PJ;
         end
@@ -104,3 +104,5 @@ function [clk,t_clk,f_clk,clk1,curr_end]=clk_gen_f_not_id5(f_in,start,stop,clk1,
     if(curr_end>stop)
         curr_end=stop;
     end
+    PJ_total=PJ_total(1:t-1);
+    f_clk=f_in;

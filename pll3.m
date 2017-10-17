@@ -27,7 +27,7 @@ end
 [v_int,v_int_num,kp,z]=integrate9(v_df,v_int_num,kp,1,z,ph_det_mode);
 f_vco=freq_change6(v_int);
 
-[clk_o,t_vco,~,clk1,curr_end_vco]=clk_gen_f_not_id5(f_vco,curr_end_vco_prev,vector_length,clk1,1,0);
+[clk_o,t_vco,f_vco,clk1,curr_end_vco]=clk_gen_f_not_id5(f_vco,curr_end_vco_prev,vector_length,clk1,1,0);
 fprintf('wygenerowano zegar od %d do %d z cz. %f GHz, clk1=%f\n',curr_end_vco_prev+1,curr_end_vco,f_vco/10^9,clk1);
 
 clk_out(curr_end_vco_prev+1:curr_end_vco)=clk_o;

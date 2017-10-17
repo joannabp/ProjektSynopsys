@@ -1,8 +1,7 @@
-function clk=clk_make(clk,t_clk)
+function [clk,f_clk,PJ_total]=clk_make(clk,t_clk,f_clk)
 global vector_length;
 global freq;
 global T_mid;
-global f0;
 global UI_probes_mid;
 global PJ;
 global PJ_tot;
@@ -14,9 +13,8 @@ t_clks=zeros(1,vector_length2/10);
 l=length(clk);
 slope_end=round(l*4/5);
 k=1;
-j=0;
 if(l<100)
-    clk=clk_gen_f_not_id5(freq,0,vector_length,0,vector_length2,1);
+    [clk,~,~,~,~,PJ_total]=clk_gen_f_not_id5(f_clk,0,vector_length,0,vector_length2,1);
 elseif(vector_length>l)
     while(slope_end+t_clk<=l&&slope(clk(slope_end:l))~=0)
         t_clks(k)=slope(clk(slope_end:l));
@@ -35,42 +33,13 @@ elseif(vector_length>l)
         k=k-1;
     end
     
-%     f_diff=10^9;
-%     while(j==0||(abs(f_diff)>=(f0(j+1)-f0(j))/2)&&(j<6))
-%         j=j+1;
-%         f_diff=freq-f0(j);
-%     end
-%     clk1=round((clk(slope_end-1)+f_diff/(f0(j+1)-f0(j)))*10^3)/10^3;
-%     if(clk1>=0.5)
-%                 clk1=clk1-0.5;
-%                 shift=-2;
-%     elseif(clk1<0)
-%                 clk1=clk1+0.5;
-%                 shift=2;
-%     else
-%                 shift=1;
-%                 clk1=clk(slope_end-1);
-%     end
     if(clk(slope_end_fall)<thr&&t_clks(k-1)>t_clk)
         slope_end_fall=slope_end_fall-1;
     end
     clk=clk(1:slope_end_fall);
-    clk=[clk clk_gen_f_not_id5(freq,length(clk),vector_length,clk(slope_end-1),vector_length2,1)];
-%     clk=[clk clk_gen_f_not_id5(freq,length(clk),vector_length,clk(slope_end-1),1,0)];
-%     t_clks(k)=slope(clk(slope_end:length(clk)));
-%     t_min=min(t_clks(2:k-1));
-%     t_max=max(t_clks(2:k-1));
-%     if(t_clks(k)<t_min||t_clks(k)>t_max)
-%         if(t_clks(k)<t_min)
-%             clk=[clk(1:slope_end_fall) 0];
-%         elseif(t_clks(k)>t_max)
-%             clk=clk(1:slope_end_fall-1);
-%         end
-%         clk=[clk clk_gen_f_not_id5(freq,length(clk),vector_length,clk(slope_end-1),vector_length2,1)];
-%     else
-
-%     end
+    [clk2,~,f_clk,~,~,PJ_total]=clk_gen_f_not_id5(f_clk,length(clk),vector_length,clk(slope_end-1),vector_length2,1);
+    clk=[clk clk2];
     
-figure
-plot(clk(l-100:l+100));
+    figure
+    plot(clk(l-100:l+100));
 end
