@@ -3,7 +3,7 @@ function [clk_o,clk_out,clk1,t_vco,f_vco,curr_end_vco,v_int_num,kp,z,error]=pll3
 %clk,clk_ideal,curr,curr_sl,curr_end,curr_end_tot,clk_out,clk1_out,curr_vco,curr_end_vco,time,v_int_num,t,slope_in_prev,slope_out_prev,t_clk,f_clk,data,slope_sampled)
 
 global vector_length;
-
+global PJ_tot;
 % ki=1;
 
 error=0;

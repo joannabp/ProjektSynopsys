@@ -54,6 +54,7 @@ min_eye_opening=10; %[mV]
 
 global PJ;
 global PJ_tot;
+global PJ_tot_vco;
 global f_PJ;
 global peak_jit;
 global BER;
@@ -67,6 +68,7 @@ global f0;
 f_PJ=1e8; %czestotliwosc Periodic Jitter
 PJ=2e-14; %jedno przesuniecie okresu w wyniku PJ
 PJ_tot=0; %zmienna akumulacyjna PJ, po osiagnieciu freq/f_PJ zmienia kierunek zmian okresu
+PJ_tot_vco=0;
 
 BER=1e-12;
 peak_jit=[3.891 4.417 4.892 5.327 5.731 6.109 6.467 6.807 7.131 7.441 7.739];

@@ -37,7 +37,7 @@ elseif(vector_length>l)
         slope_end_fall=slope_end_fall-1;
     end
     clk=clk(1:slope_end_fall);
-    [clk2,~,f_clk,~,~,PJ_total]=clk_gen_f_not_id5(f_clk,length(clk),vector_length,clk(slope_end-1),vector_length2,1);
+    [clk2,~,f_clk]=clk_gen_f_not_id5(f_clk,length(clk),vector_length,clk(slope_end-1),vector_length2,1);
     clk=[clk clk2];
     
     figure

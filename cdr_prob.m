@@ -22,6 +22,7 @@ global ctle_adapt;
 
 global T_mid;        % 0.1ns 
 global PJ_tot;
+global PJ_tot_vco;
 global PVCO;
 global Temp;
 global TJ;
@@ -35,7 +36,7 @@ TJ=Temp*F/PVCO*RJ0;
 
 
 PJ_prev=PJ_tot;
-PJ_tot=0;
+PJ_tot=PJ_tot_vco;
 acc_size=14;
 nonsignificant_bits=acc_size-10;
 
@@ -188,6 +189,7 @@ while ((i<length(input_vector)-100) &&end_pll==0)%&&j<50)
     %---
         
 end
+PJ_tot_vco=PJ_tot;
 PJ_tot=PJ_prev;
 %x=mod(round(rand()*100),10)-5;
 %fprintf('zegar wyjsciowy od %d do %d, przesuniecie %d\n',(sl1(j-1)+ceil(t_clk1/4)+x),curr_end_vco,(ceil(t_clk1/4)+x));
