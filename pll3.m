@@ -4,7 +4,7 @@ function [clk_o,clk_out,clk1,t_vco,f_vco,curr_end_vco,v_int_num,kp,z,error]=pll3
 
 global vector_length;
 global PJ_tot;
-% ki=1;
+ki=1;
 
 error=0;
 curr_end_vco_prev=curr_end_vco;
@@ -18,13 +18,7 @@ else
     v_df=0;
 end
 
-% if(t==1)
-%     [v_int,v_int_num]=integrate9(v_df,2^(acc_size-1)+(f_vco_start-freq)/10^6,kp,1);
-% else
-%     [v_int,v_int_num]=integrate9(v_df,v_int_num,kp,1);
-% end
-
-[v_int,v_int_num,kp,z]=integrate9(v_df,v_int_num,kp,1,z,ph_det_mode);
+[v_int,v_int_num,kp,z]=integrate9(v_df,v_int_num,kp,ki,z,ph_det_mode);
 f_vco=freq_change6(v_int);
 
 [clk_o,t_vco,f_vco,clk1,curr_end_vco]=clk_gen_f_not_id5(f_vco,curr_end_vco_prev,vector_length,clk1,1,0);

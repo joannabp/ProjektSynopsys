@@ -6,7 +6,6 @@ function [clk,t_clk,f_clk,clk1,curr_end, PJ_total]=clk_gen_f_not_id5(f_in,start,
     global PJ_tot;
     global f_PJ;
     global TJ;
-    %PJ_total=zeros(1,vector_length2);
     if(dr>=1)
         clk=zeros(1,stop-start);
     end
@@ -15,8 +14,9 @@ function [clk,t_clk,f_clk,clk1,curr_end, PJ_total]=clk_gen_f_not_id5(f_in,start,
     else
         shift=0;
     end
-    %t_clk=zeros(1,vector_length2);
-    %f_clk=zeros(1,vector_length2);
+%     t_clk=zeros(1,vector_length2);
+%     f_clk=zeros(1,vector_length2);
+%     PJ_total=zeros(1,vector_length2);
     curr=1;
     curr_end=1;
     t=1;
@@ -40,25 +40,21 @@ function [clk,t_clk,f_clk,clk1,curr_end, PJ_total]=clk_gen_f_not_id5(f_in,start,
         end
         f_in=f_in/(1+PJ*f_PJ);
         PJ_tot=PJ_tot+PJ*f_PJ/f_in;
-        %PJ_total(t)=PJ_tot;
+%         PJ_total(t)=PJ_tot;
         if(abs(PJ_tot)>abs(PJ))
             PJ=-PJ;
         end
         f_diff=f_in-f0(j);
         f_diff=f_diff/10^6;
-%         clk1=round((clk1+f_diff/(f0(j+1)-f0(j-1))*10^6*2)*10^3)/10^3+RJ;
-        if(abs(dr)<2)
-            if(f_in>f0(j))
-                clk1=round((clk1+f_diff/(f0(j+1)-f0(j))*10^6)*10^3)/10^3+RJ;
-            else
-                clk1=round((clk1+f_diff/(f0(j)-f0(j-1))*10^6)*10^3)/10^3+RJ;
-            %if(dr==0)
-                %fprintf('clk1 wynosi: %d\n',clk1);
-            %end
-            end
+        if(f_in>f0(j))
+            clk1=round((clk1+f_diff/(f0(j+1)-f0(j))*10^6)*10^3)/10^3+RJ;
         else
-            dr=1;
+            clk1=round((clk1+f_diff/(f0(j)-f0(j-1))*10^6)*10^3)/10^3+RJ;
         end
+%         clk1=round((clk1+f_diff/(f0(j+1)-f0(j-1))*10^6*2)*10^3)/10^3+RJ;
+%         if(dr==0)
+%             fprintf('clk1 wynosi: %d\n',clk1);
+%         end
         if(t>1)
             shift=0;
         end
@@ -66,25 +62,12 @@ function [clk,t_clk,f_clk,clk1,curr_end, PJ_total]=clk_gen_f_not_id5(f_in,start,
             if(clk1>=0.5)
                 shift=shift-1;
                 clk1=clk1-0.5;
-                %t_clk=t_clk-1;
             elseif(clk1<0)
                 shift=shift+1;
                 clk1=clk1+0.5;
-                %t_clk=t_clk+1;
             end
         end
-%         if(clk1>0.5)
-%             clk1=clk1-0.5;
-%             shift=shift-1;
-%         elseif(clk1<0)
-%             clk1=clk1+0.5;
-%             shift=shift+1;
-%         end
-        %clk1
         curr_end=curr+t0(j)-1+shift;
-        %if(dr==0)
-            %fprintf('generacja od: %d do %d\n',curr+start,curr_end+start);
-        %end
         clk(curr:curr_end)=clk_not_id3(t0(j),curr,curr_end+1,clk1,shift);
 %         fprintf('zegar wygenerowany od %d do %d\n',start+curr,start+curr_end);
 %         fprintf('------------------------------------------------------\n');
@@ -104,5 +87,5 @@ function [clk,t_clk,f_clk,clk1,curr_end, PJ_total]=clk_gen_f_not_id5(f_in,start,
     if(curr_end>stop)
         curr_end=stop;
     end
-    %PJ_total=PJ_total(1:t-1);
+%     PJ_total=PJ_total(1:t-1);
     f_clk=f_in;

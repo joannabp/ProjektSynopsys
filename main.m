@@ -4,7 +4,7 @@ clear all;
 close all;
 clc
 
-%--------- common -----%%
+%---------------------Common variables------------------------------------%
 global vector_length;
 global input_bits;
 global freq_mid;     % 10GHz
@@ -50,7 +50,7 @@ unres_val=-1; % -1/ 'prev'
 min_eye_opening=10; %[mV]
 
 
-% ----- clocks ----%%
+%---------------------Clock variables-------------------------------------%
 
 global PJ;
 global PJ_tot;
@@ -85,7 +85,8 @@ for i=1:5
     f0(i)=T_mid/t0(i)*freq_mid/UI_probes_mid;
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%---------------------START----------------------------------------------%
 
 input_data=generate_binary_data(input_bytes, 'pulses');
 input_bits=numel(input_data);
@@ -118,15 +119,15 @@ eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
 
 %save('pulses_20kB_10G_3_2_5e9all.mat');
 
-%% cdr
+%% CDR
 
-%% clock_synchro-------------------------------------------------------%%
-[data, slope_sampled, setup_200, setup0, setup200, hold_200, hold0, hold200, wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,-1,0,0,1*freq_mid,-1,-1,1);
+%% Clock_Synchro----------------------------------------------------------%
+[data, slope_sampled, setup_200, setup0, setup200, hold_200, hold0, hold200, wf, clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,-1,0,0,1*freq_mid,-1,-1,1);
 
-%% ctle adapt
-%close all;
+%% CTLE Adapt-------------------------------------------------------------%
+%   close all;
     input_bytes=500;
-    %peak_val=80;
+%   peak_val=80;
     vector_length=250*input_bytes;
     [clk,f_clk]=clk_make(clk,t_clk,f_clk);
     ylabel('zegar drivera przy ctle');
@@ -141,19 +142,19 @@ eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
     UI_probes=1/(t_clk*freq);
     channel_data = channel(driv_data);
     eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
-    [data, slope_sampled, setup_200, setup0, setup200, hold_200, hold0, hold200, wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,2);
+    [data, slope_sampled, setup_200, setup0, setup200, hold_200, hold0, hold200, wf, clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,2);
     r=0;
     while (ctle_adapt~=0&&r<12)
-        %close all
+%         close all
         r=r+1;
         prev_set=cur_set;
         [cur_set, fz, gain, peak_val]=ctle_set(prev_set);
         eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)   
         fprintf('curset %d', cur_set);
-        [data, slope_sampled,setup_200, setup0, setup200, hold_200, hold0, hold200, wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,3);
+        [data, slope_sampled,setup_200, setup0, setup200, hold_200, hold0, hold200, wf, clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,3);
     end
 
-    %% dfe peak adapt
+%% DFE Peak Adapt---------------------------------------------------------%
     set_peak_value=1;
 %    peak_val=60;
     input_bytes=500;
@@ -164,7 +165,7 @@ eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
     figure
     plot(f_clks(2:length(f_clks)))
     ylabel('cz. zegara dfe');
-    %close all;
+%     close all;
     input_data=generate_binary_data(input_bytes, 'dfe_pulses');
     input_bits=numel(input_data);
     driv_data = driv_script(input_data,clk);
@@ -173,10 +174,10 @@ eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
     channel_data = channel(driv_data);
   
     eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
-    [data, slope_sampled,setup_200, setup0, setup200, hold_200, hold0, hold200, wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,4);
+    [data, slope_sampled,setup_200, setup0, setup200, hold_200, hold0, hold200, wf, clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,4);
     set_peak_value=0;
     
- %% data transfer   
+%% Data Transfer----------------------------------------------------------%
     input_bytes=1000;
     vector_length=250*input_bytes;
     [clk,f_clk]=clk_make(clk,t_clk,f_clk);
@@ -226,8 +227,9 @@ for i=1:input_bits-8
         %i
     end
 end
-x=abs(data_c-data(1:input_bits-8));
-% %---------------------Dodatki---------------------------------------------%
+% x=abs(data_c-data(1:input_bits-8));
+
+%% Dodatki----------------------------------------------------------------%
 % 
 % figure
 % plot(time, driv_data, time, eq_dat, time, clk(1:numel(driv_data));%, time, clk(1:numel(clk_shf)-120)*10);
