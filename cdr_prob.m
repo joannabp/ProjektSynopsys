@@ -1,5 +1,5 @@
 
-function  [out_data, slope_sampled,setup_200, setup0, setup200, hold_200, hold0, hold200, wf,clk_o,clk_o2,clk1,f_vco_end,v_int_end,kp_end]=cdr_prob(input_vector,clk_start,clk_start2,clk1,f_vco_start,v_int_start,kp_start,stage)
+function  [out_data, slope_sampled,setup_200, setup0, setup200, hold_200, hold0, hold200, wf,clk_o,clk_o2,clk1,f_vco_end,v_int_end,kp_end,f_vcos,setupt,holdt]=cdr_prob(input_vector,clk_start,clk_start2,clk1,f_vco_start,v_int_start,kp_start,stage)
 
 
 global input_bits;
@@ -21,8 +21,7 @@ global ctle_adapt;
 
 
 global T_mid;        % 0.1ns 
-global PJ_tot;
-global PJ_tot_vco;
+global PJ;
 global PVCO;
 global Temp;
 global TJ;
@@ -35,13 +34,12 @@ PVCO=100;
 TJ=Temp*F/PVCO*RJ0;
 
 
-PJ_prev=PJ_tot;
-PJ_tot=PJ_tot_vco;
+PJ_prev=PJ;
+PJ=0;
 acc_size=14;
 nonsignificant_bits=acc_size-10;
 
 vector_length2=round(vector_length*UI_probes_mid*4/T_mid);
-delay=0;
 z=0;
 zmax=10;
 j=1;
@@ -55,12 +53,11 @@ t_clks=zeros(1,vector_length2);
 %t_clk2=zeros(1,vector_length2);
 t_clks(1:2)=round(T_mid/UI_probes_mid*freq_mid/f_vco_start);
 %t_clk2(1:2)=round(T_mid/UI_probes_mid*freq_mid/f_vco_start);
-
+delay=10;
+f_vcos(2:delay)=f_vco_start;
 if(clk_start==-1)
-    delay=10;
     [clk,~,~,clk1,curr_end_vco]=clk_gen_f_not_id5(f_vcos(1),0,vector_length,clk1,delay,0);
     fprintf('startowy zegar wyjsciowy wygenerowany do %d\n',curr_end_vco);
-    f_vcos(2:delay)=f_vco_start;
     clk2=clk(t_clks(1)/2+1:curr_end_vco);
 else
     clk=clk_start;
@@ -99,6 +96,10 @@ setup200=zeros(1,input_bits);
 hold_200=zeros(1,input_bits);
 hold0=zeros(1,input_bits);
 hold200=zeros(1,input_bits);
+if(stage==0)
+    setupt=zeros(1,input_bits);
+    holdt=zeros(1,input_bits);
+end
 
 sl1=zeros(1,vector_length2);
 sl2=zeros(1,vector_length2);
@@ -161,8 +162,12 @@ while ((i<length(input_vector)-100) &&end_pll==0)%&&j<50)
     hold_200(t)=hold_200_tmp;
     hold0(t)=hold0_tmp;
     hold200(t)=hold200_tmp;
-
-    
+    if(stage==0)
+        A=[setup_200_tmp setup0_tmp setup200_tmp];
+        setupt(t)=min(A);
+        A=[hold_200_tmp hold0_tmp hold200_tmp];
+        holdt(t)=min(A);
+    end
     i=i+t_clks(j);
     t=t+1;
     
@@ -184,8 +189,11 @@ while ((i<length(input_vector)-100) &&end_pll==0)%&&j<50)
     %---------------------------------------------------------------------%
         
 end
-PJ_tot_vco=PJ_tot;
-PJ_tot=PJ_prev;
+if(stage==0)
+    setupt=setupt(1:t-1);
+    holdt=holdt(1:t-1);
+end
+PJ=PJ_prev;
 %x=mod(round(rand()*100),10)-5;
 %fprintf('zegar wyjsciowy od %d do %d, przesuniecie %d\n',(sl1(j-1)+ceil(t_clks/4)+x),curr_end_vco,(ceil(t_clks/4)+x));
 if(stage~=0)
@@ -220,6 +228,7 @@ end
     elseif(stage==0)
         ylabel('zegary prob. i dane');
     end
+f_vcos=f_vcos(1:j-1);
 if(stage==1||stage==0)
     figure
     plot(f_vcos(1:j-1));

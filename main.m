@@ -54,7 +54,6 @@ min_eye_opening=10; %[mV]
 
 global PJ;
 global PJ_tot;
-global PJ_tot_vco;
 global f_PJ;
 global peak_jit;
 global BER;
@@ -65,15 +64,15 @@ global t0;
 global f0;
 
 
-f_PJ=1e8; %czestotliwosc Periodic Jitter
-PJ=2e-14; %jedno przesuniecie okresu w wyniku PJ
-PJ_tot=0; %zmienna akumulacyjna PJ, po osiagnieciu freq/f_PJ zmienia kierunek zmian okresu
-PJ_tot_vco=0;
+f_PJ=1e8;   %czestotliwosc Periodic Jitter
+PJ=50e6;     %amplituda Periodic Jitter w dziedzinie czestotliwosci
+PJ_tot=0;   %zmienna akumulacyjna PJ*f_PJ/freq, po osiagnieciu PJ zmienia kierunek zmian okresu
+%PJ_tot_vco=0;
 
 BER=1e-12;
-peak_jit=[3.891 4.417 4.892 5.327 5.731 6.109 6.467 6.807 7.131 7.441 7.739];
+peak_jit=[7.739 7.441 7.131 6.807 6.467 6.109 5.731 5.327 4.892 4.417 3.891];
 peak_jit=peak_jit(log10(1e-3/BER));
-RJ0=5e-3;
+RJ0=0;%2e6;%5e-3;
 
 thr=0.5;
 vector_length=250*input_bytes;
@@ -97,7 +96,6 @@ input_bits=numel(input_data);
 %---------------------Driver----------------------------------------------%
 [clk,t_clk,f_clk]=clk_gen_f_not_id5(freq,0,vector_length,0,vector_length2,1);
 clk=clk(t_clk/2+mod(round(rand()*100),10)-5:length(clk));
-
 driv_data = driv_script(input_data,clk);
 clk=clk(length(driv_data):length(clk));
 UI_probes=1/(t_clk*freq);
@@ -189,22 +187,7 @@ eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
     channel_data = channel(driv_data);
 
     eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
-    [data, slope_sampled, setup_200, setup0, setup200, hold_200, hold0, hold200,  wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,0);
-    
-    if(vector_length<length(clk))
-        f_clks=freq_check(clk(1:vector_length));
-    else
-        f_clks=freq_check(clk);
-    end
-    figure
-    plot(f_clks(2:length(f_clks)))
-    ylabel('cz. zegara taktujacego dane');
-    
-    f_vcos=freq_check(clk_vco);
-    figure
-    plot(f_vcos(2:length(f_vcos)))
-    ylabel('cz. zegara vco');
-    
+    [data, slope_sampled, setup_200, setup0, setup200, hold_200, hold0, hold200,  wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,f_vcos_orig,setup_t,hold_t]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,0);
     
 error=0;
 k=1;
@@ -234,6 +217,25 @@ end
 % figure
 % plot(time, driv_data, time, eq_dat, time, clk(1:numel(driv_data));%, time, clk(1:numel(clk_shf)-120)*10);
 % ylabel('data driver, channel, clock');
+
+
+
+%     if(vector_length<length(clk))
+%         f_clks=freq_check(clk(1:vector_length));
+%     else
+%         f_clks=freq_check(clk);
+%     end
+%     figure
+%     plot(f_clks(1:length(f_clks)))
+%     ylabel('cz. zegara taktujacego dane');
+%     
+%     f_vcos=freq_check(clk_vco);
+%     figure
+%     plot(round((f_vcos(10:length(f_vcos_orig)-1)-f_vcos_orig(11:length(f_vcos_orig)))/10^6));
+%     ylabel('jitter vco');
+%     avg_jitter=sum(abs(f_vcos(10:length(f_vcos_orig)-1)-f_vcos_orig(11:length(f_vcos_orig))))/(length(f_vcos_orig)-10);
+%     fprintf('srednie odchylenie czestotliwosci wynosi %f MHz\n',avg_jitter/10^6);
+
 UI_probes=t_clk;
 figure
 for i=1:length(driv_data)/UI_probes/3
@@ -253,10 +255,33 @@ for i=1:length(eq_dat)/UI_probes/3
     plot(-UI_probes:UI_probes-1, eq_dat(UI_probes/2+1+3*UI_probes*(i-1):3*UI_probes*(i) -UI_probes/2 )) ;
     hold on
 end
-
 figure
-plot(data)
-ylabel('data recovered');
+plot(setup_t*1e12)
+ylabel('min setup time[ps]');
+figure
+plot(hold_t*1e12)
+ylabel('min hold time[ps]');
+% figure
+% plot(setup_200)
+% ylabel('setup 200');
+% figure
+% plot(setup0)
+% ylabel('setup 0');
+% figure
+% plot(setup200)
+% ylabel('setup -200');
+% figure
+% plot(hold_200)
+% ylabel('hold 200');
+% figure
+% plot(hold0)
+% ylabel('hold 0');
+% figure
+% plot(hold200)
+% ylabel('hold -200');
+% figure
+% plot(data)
+% ylabel('data recovered');
 % setup=setup';
 % holdd=holdd';
 % 
