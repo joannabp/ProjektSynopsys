@@ -1,26 +1,31 @@
-function [clk,t_clk,f_clk,clk1,curr_end,PJ_total]=clk_gen_f_not_id5(f_in,start,stop,clk1,vector_length2,dr)
+function [clk,t_clk,f_clk,clk1,curr_end,t_shift,PJ_total]=clk_gen_f_not_id5(f_in,start,stop,clk1,vector_length2,dr)
     global t0;
     global f0;
-    global peak_jit;
     global PJ;
     global PJ_tot;
     global freq;
     global f_PJ;
     global TJ;
-    if(dr==1)
+    if(dr>=1)
         clk=zeros(1,stop-start);
         RJ=0;
     else
         PJ=0;
     end
+    t_shift=zeros(1,vector_length2);
 %     t_clk=zeros(1,vector_length2);
 %     f_clk=zeros(1,vector_length2);
 %     PJ_total=zeros(1,vector_length2);
     curr=1;
     curr_end=1;
+    clk1_id=clk1;
     t=1;
     j=0;
+    PJ_prev=0;
     f_diff=10^9;
+    if(dr==1)
+        PJ=PJ/2;
+    end
     while(j==0||(abs(f_diff)>=(f0(j+1)-f0(j))/2)&&(j<6))
         j=j+1;
         f_diff=f_in-f0(j);
@@ -34,19 +39,30 @@ function [clk,t_clk,f_clk,clk1,curr_end,PJ_total]=clk_gen_f_not_id5(f_in,start,s
 %                 RJ=peak_jit;
 %                 fprintf('peak jitter\n');
 %             end
-        else
-            f_in=freq+PJ*sin(PJ_tot/PJ*pi());%f_in/(1+PJ*f_PJ);
-            f_diff=f_in-f0(j);
-            PJ_tot=PJ_tot+PJ*f_PJ/f_in;
-            if(abs(PJ_tot)>abs(PJ))
-                PJ=-PJ;
-                PJ_tot=0;
-            end
+        elseif(abs(PJ)>0)
+                f_in=freq+PJ*sin(PJ_tot/PJ*pi());%f_in/(1+PJ*f_PJ);
+                f_diff=f_in-f0(j);
+                PJ_tot=PJ_tot+PJ*f_PJ/f_in;
         end
         if(f_in>f0(j))
             clk1=round((clk1+f_diff/(f0(j+1)-f0(j)))*10^6)/10^6;%+RJ;%clk1+f_diff/(f0(j+1)-f0(j))*10^6+RJ;
+            clk1_id=round((clk1_id+(freq-f0(j))/(f0(j+1)-f0(j)))*10^6)/10^6;
         else
             clk1=round((clk1+f_diff/(f0(j)-f0(j-1)))*10^6)/10^6;%+RJ;%clk1+f_diff/(f0(j)-f0(j-1))*10^6+RJ;
+            clk1_id=round((clk1_id+(freq-f0(j))/(f0(j)-f0(j-1)))*10^6)/10^6;
+        end
+        if(abs(PJ_tot)>abs(PJ))
+            PJ=-PJ;
+            PJ_prev=PJ_tot;
+            PJ_tot=0;
+            if(dr==1)
+                PJ=2*PJ;
+                dr=2;
+            end
+        end
+        t_shift(t)=1/f_in-1/freq;
+        if(t>1)
+            t_shift(t)=t_shift(t)+t_shift(t-1);
         end
 %         clk1=round((clk1+f_diff/(f0(j+1)-f0(j-1))*10^6*2)*10^3)/10^3+RJ;
 %         if(dr==0)
@@ -76,6 +92,7 @@ function [clk,t_clk,f_clk,clk1,curr_end,PJ_total]=clk_gen_f_not_id5(f_in,start,s
         t=t+1;
     end
     f_clk=f_in;
+    PJ_tot=PJ_prev;
     if(length(clk)>stop-start)
         clk=clk(1:stop-start);
     end
@@ -83,4 +100,5 @@ function [clk,t_clk,f_clk,clk1,curr_end,PJ_total]=clk_gen_f_not_id5(f_in,start,s
     if(curr_end>stop)
         curr_end=stop;
     end
+    t_shift=t_shift(1:t-1);
 %     PJ_total=PJ_total(1:t-1);
