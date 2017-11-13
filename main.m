@@ -65,7 +65,7 @@ global f0;
 
 
 f_PJ=1e8;   %czestotliwosc Periodic Jitter
-PJ_main=1500e6;
+PJ_main=500e6;
 PJ=PJ_main*f_PJ/freq;     %amplituda Periodic Jitter w dziedzinie czestotliwosci
 %PJ=15e6;
 PJ_tot=0;   %zmienna akumulacyjna PJ*f_PJ/freq, po osiagnieciu PJ zmienia kierunek zmian okresu
@@ -80,13 +80,12 @@ f0=zeros(1,5);
 for i=1:5
     f0(i)=T_mid/t0(i)*freq_mid/UI_probes_mid;
 end
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %---------------------START----------------------------------------------%
 
 input_data=generate_binary_data(input_bytes, 'pulses');
-input_data2=generate_binary_data(input_bytes/4, 'none');
-input_data=[input_data input_data2];
+%input_data2=generate_binary_data(input_bytes, 'none');
+%input_data=[input_data input_data2];
 input_bits=numel(input_data);
 input_bytes=input_bits/8;
 vector_length=250*input_bytes;
@@ -170,8 +169,8 @@ save('10gpretest.mat');
 %    peak_val=60;
     input_bytes=500;
     input_data=generate_binary_data(input_bytes, 'dfe_pulses');
-  %  input_data2=generate_binary_data(input_bytes/2, 'none');
-   % input_data=[input_data input_data2];
+    input_data2=generate_binary_data(input_bytes*4/5, 'none');
+    input_data=[input_data input_data2];
     input_bits=numel(input_data);
     input_bytes=input_bits/8;
     vector_length=250*input_bytes;
@@ -203,10 +202,11 @@ save('10gpretest.mat');
 
 dane_iter=0;
 dane_iter_max=2;
-input_bytes=10000;
+input_bytes=2000;
 vector_length=250*input_bytes;
 [clk,f_clk]=clk_make(clk,t_clk,f_clk);
 % ylabel('zegar drivera przy danych');
+%[clk,t_clk,f_clk,~,~,t_shift]=clk_gen_f_not_id5(freq,0,vector_length,0,vector_length2,1);
 input_data=generate_binary_data(input_bytes, 'none');
 input_bits=numel(input_data);
 driv_data = driv_script(input_data,clk); % (1+(dane_iter-1)/dane_iter_max*vector_length:dane_iter/dane_iter_max*vector_length));
@@ -291,7 +291,7 @@ end
 
 %     f_clks=freq_check(clk(1:length(driv_data)));
 %     figure
-%     plot(f_clks(1:length(f_clks)))
+%     plot(f_clks)
 %     ylabel('cz. zegara taktujacego dane');
     
     figure
