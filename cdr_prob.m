@@ -61,7 +61,7 @@ delay=10;
 f_vcos(2:delay)=f_vco_start;
 if(clk_start==-1)
     [clk,~,~,clk1,curr_end_vco]=clk_gen_f_not_id5(f_vcos(1),0,vector_length,clk1,delay,0);
-    fprintf('startowy zegar wyjsciowy wygenerowany do %d\n',curr_end_vco);
+    %fprintf('startowy zegar wyjsciowy wygenerowany do %d\n',curr_end_vco);
     clk2=clk(t_clks(1)/2+1:curr_end_vco);
 else
     clk=clk_start;
@@ -136,11 +136,11 @@ while ((i<length(input_vector)-100) &&end_pll==0)%&&j<50)
         sl2(j)=slope(clk2(i:length(clk2)))-1;
     end
     i
-    fprintf('t vco: %d \n',t_clks(j));
-    fprintf('pobierany clk od %d do %d\n',i,i+t_clks(j));
+    %fprintf('t vco: %d \n',t_clks(j));
+    %fprintf('pobierany clk od %d do %d\n',i,i+t_clks(j));
     [data, ~, setup_200_tmp, setup0_tmp, setup200_tmp, hold_200_tmp, hold0_tmp, hold200_tmp, wf, th200_k, scaled_th_dat, sample]=data_recovery(input_vector(i:i+t_clks(j)), clk(i:i+t_clks(j)), clk(i:i+t_clks(j)), wf, th200_k, scaled_th_dat, sample);
     i=i+floor(t_clks(j)/2);
-    fprintf('pobierany clk2 od %d do %d\n',i,i+t_clks(j+1));
+    %fprintf('pobierany clk2 od %d do %d\n',i,i+t_clks(j+1));
     [~, slp, ~, ~, ~,~, ~, ~, ~, ~, ~, ~]=data_recovery(input_vector(i:i+t_clks(j+1)), clk2(i:i+t_clks(j+1)), clk2(i:i+t_clks(j+1)), wf, th200_k, scaled_th_dat, sample);
     i=i-floor(t_clks(j)/2);
     %---- set peak_val ---------------------------------------------------%
@@ -166,7 +166,7 @@ while ((i<length(input_vector)-100) &&end_pll==0)%&&j<50)
     hold_200(t)=hold_200_tmp;
     hold0(t)=hold0_tmp;
     hold200(t)=hold200_tmp;
-    if(stage==0||stage==4)
+    if(stage~=1)
         A=[setup_200_tmp setup0_tmp setup200_tmp];
         setupt(t)=min(A);
         A=[hold_200_tmp hold0_tmp hold200_tmp];
@@ -234,9 +234,9 @@ kps=kps(1:j-1);
 
 if(stage~=0)
 %    clk_o=clk(sl1(j-1)+ceil(t_clks/4)+x:curr_end_vco);
-    sl_end=slope_fall(clk(sl1(j-1):curr_end_vco))+sl1(j-1);
+    sl_end=slope_fall(clk(sl1(j-1):curr_end_vco))+sl1(j-1)-8;
     clk_o=clk(sl_end:curr_end_vco);
-    clk_o2=clk2(sl2(j-1)+1:length(clk2));
+    clk_o2=clk2(sl2(j-1)-7:length(clk2));
 elseif(dane_iter<dane_iter_max)
     clk_o=clk(length(input_vector):curr_end_vco);
     clk_o2=clk2(length(input_vector):length(clk2));
