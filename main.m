@@ -64,8 +64,8 @@ global t0;
 global f0;
 
 
-f_PJ=1e8;   %czestotliwosc Periodic Jitter
-PJ_main=500e6;
+f_PJ=2e8;   %czestotliwosc Periodic Jitter
+PJ_main=0;%2000e6;
 PJ=PJ_main*f_PJ/freq;     %amplituda Periodic Jitter w dziedzinie czestotliwosci
 %PJ=15e6;
 PJ_tot=0;   %zmienna akumulacyjna PJ*f_PJ/freq, po osiagnieciu PJ zmienia kierunek zmian okresu
@@ -148,21 +148,21 @@ eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
     eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
     [data, slope_sampled, setup_200, setup0, setup200, hold_200, hold0, hold200, wf, clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,~,setup_ctle,hold_ctle]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,2);
     r=0;
-    while (ctle_adapt~=0&&r<12)
-%         close all
-        r=r+1;
-        prev_set=cur_set;
-        [cur_set, fz, gain, peak_val]=ctle_set(prev_set);
-        eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)   
-        fprintf('curset %d', cur_set);
-        [data, slope_sampled,setup_200, setup0, setup200, hold_200, hold0, hold200, wf, clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,~,setup_ctle,hold_ctle]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,3);
-    end
-plot(setup_ctle*1e12)
-ylabel('min setup ctle[ps]');
-figure
-plot(hold_ctle*1e12)
-ylabel('min hold ctle[ps]');
-save('10gpretest.mat');
+%     while (ctle_adapt~=0&&r<12)
+% %         close all
+%         r=r+1;
+%         prev_set=cur_set;
+%         [cur_set, fz, gain, peak_val]=ctle_set(prev_set);
+%         eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)   
+%         fprintf('curset %d', cur_set);
+%         [data, slope_sampled,setup_200, setup0, setup200, hold_200, hold0, hold200, wf, clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,~,setup_ctle,hold_ctle]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,3);
+%     end
+% plot(setup_ctle*1e12)
+% ylabel('min setup ctle[ps]');
+% figure
+% plot(hold_ctle*1e12)
+% ylabel('min hold ctle[ps]');
+% save('10gpretest.mat');
 
 %% DFE Peak Adapt---------------------------------------------------------%
     set_peak_value=1;
@@ -195,14 +195,14 @@ ylabel('min setup dfe[ps]');
 figure
 plot(hold_dfe*1e12)
 ylabel('min hold dfe[ps]');
-save('10gpretest.mat');
+% save('10gpretest.mat');
     
 %% Data Transfer ---------------------------------------------------------%
 
 
 dane_iter=0;
 dane_iter_max=2;
-input_bytes=2000;
+input_bytes=500;
 vector_length=250*input_bytes;
 [clk,f_clk]=clk_make(clk,t_clk,f_clk);
 % ylabel('zegar drivera przy danych');
@@ -311,24 +311,24 @@ end
 %     avg_jitter=sum(abs(f_vcos(10:length(f_vcos_orig)-1)-f_vcos_orig(11:length(f_vcos_orig))))/(length(f_vcos_orig)-10);
 %     fprintf('srednie odchylenie czestotliwosci wynosi %f MHz\n',avg_jitter/10^6);
 
-% UI_probes=t_clk;
-% figure
-% for i=1:length(driv_data)/UI_probes/3
-%     plot(-UI_probes:UI_probes-1, driv_data(1+2*UI_probes*(i-1):2*UI_probes*(i)));
-%     hold on
-% end
-% 
-% figure
-% for i=1:length(channel_data)/UI_probes/3
-%     plot(-UI_probes:UI_probes-1, channel_data(UI_probes/2+1+3*UI_probes*(i-1):3*UI_probes*(i) -UI_probes/2)) ;
-%     hold on
-% end
-% 
-% figure
-% for i=1:length(eq_dat)/UI_probes/3
-%     plot(-UI_probes:UI_probes-1, eq_dat(UI_probes/2+1+3*UI_probes*(i-1):3*UI_probes*(i) -UI_probes/2 )) ;
-%     hold on
-% end
+UI_probes=t_clk;
+figure
+for i=1:length(driv_data)/UI_probes/3
+    plot(-UI_probes:UI_probes-1, driv_data(1+2*UI_probes*(i-1):2*UI_probes*(i)));
+    hold on
+end
+
+figure
+for i=1:length(channel_data)/UI_probes/3
+    plot(-UI_probes:UI_probes-1, channel_data(UI_probes/2+1+3*UI_probes*(i-1):3*UI_probes*(i) -UI_probes/2)) ;
+    hold on
+end
+
+figure
+for i=1:length(eq_dat)/UI_probes/3
+    plot(-UI_probes:UI_probes-1, eq_dat(UI_probes/2+1+3*UI_probes*(i-1):3*UI_probes*(i) -UI_probes/2 )) ;
+    hold on
+end
 figure
 plot(setup_total*1e12)
 ylabel('min setup time[ps]');
