@@ -1,4 +1,4 @@
-function [out_data, slope_sampled, setup_200, setup0, setup200, hold_200, hold0, hold200, wf, th200_k, scaled_th_dat, sample]=data_recovery(input_vector, clk, clk_shf, wf, th200_k, scaled_th_dat, sample)
+function [out_data, slope_sampled, setup_200, setup0, setup200, hold_200, hold0, hold200, wf, th200_k, scaled_th_dat, sample, th_200, th0, th200]=data_recovery(input_vector, clk, clk_shf, wf, th200_k, scaled_th_dat, sample)
 
 
 global thr;

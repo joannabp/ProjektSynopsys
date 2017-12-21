@@ -91,7 +91,6 @@ wf=[0;0;0];
 i=1;
 t=1;
 k=1;
-pt=1;
 out_data=zeros(1,input_bits);
 slope_sampled=zeros(1,input_bits);
 
@@ -102,9 +101,9 @@ hold_200=zeros(1,input_bits);
 hold0=zeros(1,input_bits);
 hold200=zeros(1,input_bits);
 
-th_200_all=zeros(1,input_bits);
-th200_all=zeros(1,input_bits);
-th0_all=zeros(1,input_bits);
+th_200_all=zeros(1,size(input_vector));
+th200_all=zeros(1,size(input_vector));
+th0_all=zeros(1,size(input_vector));
 
 
 if(stage~=1)
@@ -143,13 +142,12 @@ while ((i<length(input_vector)-100) &&end_pll==0)%&&j<50)
         sl2(j)=slope(clk2(i:length(clk2)))-1;
     end
     i
-    
     %fprintf('t vco: %d \n',t_clks(j));
     %fprintf('pobierany clk od %d do %d\n',i,i+t_clks(j));
     [data, ~, setup_200_tmp, setup0_tmp, setup200_tmp, hold_200_tmp, hold0_tmp, hold200_tmp, wf, th200_k, scaled_th_dat, sample, th_200, th0, th200]=data_recovery(input_vector(i:i+t_clks(j)), clk(i:i+t_clks(j)), clk(i:i+t_clks(j)), wf, th200_k, scaled_th_dat, sample);
-    th_200_all(j)=th_200(1);
-    th200_all(j)=th200(1);
-    th0_all(j)=th0(1);
+    th_200_all(1.i*50:(i+1)*50)=th_200;
+    th200_all(1,i*50:(i+1)*50)=th200;
+    th0_all(1i*50:(i+1)*50)=th0;
 
     
     i=i+floor(t_clks(j)/2);
