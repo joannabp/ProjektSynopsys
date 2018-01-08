@@ -18,8 +18,6 @@ global prev_val;
 global acc_size;
 global nonsignificant_bits;
 global ctle_adapt;
-global dane_iter;
-global dane_iter_max;
 
 
 global T_mid;        % 0.1ns 
@@ -30,7 +28,6 @@ global TJ;
 global F;
 global RJ0;
 global zmax;
-global count;
 Temp=300;
 F=1;
 PVCO=100;
@@ -45,7 +42,6 @@ nonsignificant_bits=acc_size-10;
 vector_length2=round(vector_length*UI_probes_mid*4/T_mid);
 z=0;
 zmax=10;
-count=0;
 j=1;
 %zmienna porzadkowa inkrementowana co wykryte zbocze zegara
 end_pll=0;
@@ -232,29 +228,17 @@ PJ=PJ_prev;
         ylabel('zegary prob. i dane ctle2');
     elseif(stage==4)
         ylabel('zegary prob. i dane dfe');
-    elseif(stage==0)
-        if(dane_iter==1)
-        ylabel('zegary prob. i dane czesc 1');
-        elseif(dane_iter==2)
-        ylabel('zegary prob. i dane czesc 2');
-        elseif(dane_iter==3)
-        ylabel('zegary prob. i dane czesc 3');
-        elseif(dane_iter==4)
-        ylabel('zegary prob. i dane czesc 4');
-        end
+    elseif(stage==0) 
+        ylabel('zegary prob. i dane');
     end
 f_vcos=f_vcos(1:j-1);
 v_int_num=v_int_num(1:j-1);
 kps=kps(1:j-1);
 
 if(stage~=0)
-%    clk_o=clk(sl1(j-1)+ceil(t_clks/4)+x:curr_end_vco);
-    sl_end=slope_fall(clk(sl1(j-1):curr_end_vco))+sl1(j-1)-8;
+    sl_end=slope_fall(clk(sl1(j-1):curr_end_vco))+sl1(j-1);%-8;
     clk_o=clk(sl_end:curr_end_vco);
-    clk_o2=clk2(sl2(j-1)-7:length(clk2));
-elseif(dane_iter<dane_iter_max)
-    clk_o=clk(length(input_vector):curr_end_vco);
-    clk_o2=clk2(length(input_vector):length(clk2));
+    clk_o2=clk2(sl2(j-1):length(clk2));
 else
     clk_o=clk;
     clk_o2=clk2;
@@ -270,35 +254,35 @@ if(stage~=0)%||stage==0)
     plot(f_vcos(1:j-1));
     if(stage==1)
         ylabel('cz. vco w czasie synchronizacji');
-    elseif(stage==2)
-        ylabel('cz. vco w czasie ctle1');
-    elseif(stage==3)
-        ylabel('cz. vco w czasie ctle2');
-    elseif(stage==4)
-        ylabel('cz. vco w czasie dfe');
-    end
-    figure
-    plot(v_int_num(1:j-1));
-    if(stage==1)
-        ylabel('wartosci akumulatora w czasie synchronizacji');
-    elseif(stage==2)
-        ylabel('wartosci akumulatora w czasie ctle1');
-    elseif(stage==3)
-        ylabel('wartosci akumulatora w czasie ctle2');
-    elseif(stage==4)
-        ylabel('wartosci akumulatora w czasie dfe');
-    end
-    % figure
-    %scatter(1:j,sl1(1:j),1:j,sl2(1:j));
-    figure
-    plot(kps(1:j-1))
-    if(stage==1)
-        ylabel('wspolczynniki petli integracyjnej w czasie synchronizacji');
-    elseif(stage==2)
-        ylabel('wspolczynniki petli integracyjnej w czasie ctle1');
-    elseif(stage==3)
-        ylabel('wspolczynniki petli integracyjnej w czasie ctle2');
-    elseif(stage==4)
-        ylabel('wspolczynniki petli integracyjnej w czasie dfe');
+%     elseif(stage==2)
+%         ylabel('cz. vco w czasie ctle1');
+%     elseif(stage==3)
+%         ylabel('cz. vco w czasie ctle2');
+%     elseif(stage==4)
+%         ylabel('cz. vco w czasie dfe');
+%     end
+%     figure
+%     plot(v_int_num(1:j-1));
+%     if(stage==1)
+%         ylabel('wartosci akumulatora w czasie synchronizacji');
+%     elseif(stage==2)
+%         ylabel('wartosci akumulatora w czasie ctle1');
+%     elseif(stage==3)
+%         ylabel('wartosci akumulatora w czasie ctle2');
+%     elseif(stage==4)
+%         ylabel('wartosci akumulatora w czasie dfe');
+%     end
+%     % figure
+%     %scatter(1:j,sl1(1:j),1:j,sl2(1:j));
+%     figure
+%     plot(kps(1:j-1))
+%     if(stage==1)
+%         ylabel('wspolczynniki petli integracyjnej w czasie synchronizacji');
+%     elseif(stage==2)
+%         ylabel('wspolczynniki petli integracyjnej w czasie ctle1');
+%     elseif(stage==3)
+%         ylabel('wspolczynniki petli integracyjnej w czasie ctle2');
+%     elseif(stage==4)
+%         ylabel('wspolczynniki petli integracyjnej w czasie dfe');
     end
 end

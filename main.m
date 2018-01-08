@@ -41,8 +41,6 @@ global set_peak_value;
 global fp1;
 global fp2;
 
-global dane_iter;
-global dane_iter_max;
 ctle_adapt=0;
 set_peak_value=0;
 %peak_val=60;
@@ -65,7 +63,7 @@ global f0;
 
 
 f_PJ=2e8;   %czestotliwosc Periodic Jitter
-PJ_main=0;%2000e6;
+PJ_main=3000e6;
 PJ=PJ_main*f_PJ/freq;     %amplituda Periodic Jitter w dziedzinie czestotliwosci
 %PJ=15e6;
 PJ_tot=0;   %zmienna akumulacyjna PJ*f_PJ/freq, po osiagnieciu PJ zmienia kierunek zmian okresu
@@ -148,15 +146,15 @@ eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
     eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
     [data, slope_sampled, setup_200, setup0, setup200, hold_200, hold0, hold200, wf, clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,2);
     r=0;
-%     while (ctle_adapt~=0&&r<12)
-% %         close all
-%         r=r+1;
-%         prev_set=cur_set;
-%         [cur_set, fz, gain, peak_val]=ctle_set(prev_set);
-%         eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)   
-%         fprintf('curset %d', cur_set);
-%         [data, slope_sampled,setup_200, setup0, setup200, hold_200, hold0, hold200, wf, clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,~,setup_ctle,hold_ctle]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,3);
-%     end
+    while (ctle_adapt~=0&&r<12)
+%         close all
+        r=r+1;
+        prev_set=cur_set;
+        [cur_set, fz, gain, peak_val]=ctle_set(prev_set);
+        eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)   
+        fprintf('curset %d', cur_set);
+        [data, slope_sampled,setup_200, setup0, setup200, hold_200, hold0, hold200, wf, clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,3);
+    end
 % plot(setup_ctle*1e12)
 % ylabel('min setup ctle[ps]');
 % figure
@@ -169,10 +167,10 @@ eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
 %    peak_val=60;
     input_bytes=500;
     input_data=generate_binary_data(input_bytes, 'dfe_pulses');
-    input_data2=generate_binary_data(input_bytes*4/5, 'none');
-    input_data=[input_data input_data2];
+    %input_data2=generate_binary_data(input_bytes*4/5, 'none');
+    %input_data=[input_data input_data2];
     input_bits=numel(input_data);
-    input_bytes=input_bits/8;
+    %input_bytes=input_bits/8;
     vector_length=250*input_bytes;
     [clk,f_clk]=clk_make(clk,t_clk,f_clk);
 %     ylabel('zegar drivera przy dfe');
@@ -187,22 +185,20 @@ eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
     channel_data = channel(driv_data);
   
     eq_dat=ctle(channel_data, fz, gain); % (signal, fz, gain)
-    [data, slope_sampled,setup_200, setup0, setup200, hold_200, hold0, hold200, wf, clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,~,setup_dfe,hold_dfe]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,4);
+    [data, slope_sampled,setup_200, setup0, setup200, hold_200, hold0, hold200, wf, clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end]=cdr_prob(eq_dat,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,4);
     set_peak_value=0;
-    figure
-plot(setup_dfe*1e12)
-ylabel('min setup dfe[ps]');
-figure
-plot(hold_dfe*1e12)
-ylabel('min hold dfe[ps]');
+%     figure
+% plot(setup_dfe*1e12)
+% ylabel('min setup dfe[ps]');
+% figure
+% plot(hold_dfe*1e12)
+% ylabel('min hold dfe[ps]');
 % save('10gpretest.mat');
     
 %% Data Transfer ---------------------------------------------------------%
 
 
-dane_iter=0;
-dane_iter_max=2;
-input_bytes=100;
+input_bytes=500;
 vector_length=250*input_bytes;
 [clk,f_clk]=clk_make(clk,t_clk,f_clk);
 % ylabel('zegar drivera przy danych');
@@ -225,69 +221,28 @@ for i=i:8:input_bits-8
     k=k+1;
 end
     
-for i=1:input_bits-8%*dane_iter
+for i=1:input_bits-8
     if(data_c(i)~=data(i))%&&(mod(i,input_bits/dane_iter_max)<input_bits/dane_iter_max-3))
         error=error+1;
         i
     end
 end
 
-% data_curr=0;
-% data=[];
-% data_cc=[];
-% f_vcos=[];
-% v_int_num=[];
-% kps=[];
-% setup_total=[];
-% hold_total=[];
-% input_bits=input_bits/dane_iter_max;
-% save('10gtest.mat');
-% %% Data Recieve ----------------------------------------------------------%
-% 
-% while(dane_iter<dane_iter_max)
-%     dane_iter=dane_iter+1;
-%     %input_data=[input_data input_data_temp];
-%     %clk=clk(length(driv_data):length(clk));
-%     %close all;
-%     [datar, slope_sampled, setup_200, setup0, setup200, hold_200, hold0, hold200, wf,clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,f_vcos_temp,setup_tt,hold_tt,v_int_temp,kps_temp,data_curr]=cdr_prob(eq_dat(1+data_curr:floor(dane_iter/dane_iter_max*length(eq_dat))),clk_vco,clk_vco2,clk1_out,f_vco_end,v_int_end,kp_end,0);
-%     %data_curr=floor(dane_iter/dane_iter_max*length(eq_dat));
-%     figure
-%     plot(eq_dat(data_curr-500:data_curr+500))
-%     %data=data(1:length(data)-8);
-%     data=[data datar(1:length(datar)-8)];
-%     f_vcos=[f_vcos f_vcos_temp];
-%     v_int_num=[v_int_num v_int_temp];
-%     kps=[kps kps_temp];
-%     setup_total=[setup_total setup_tt];
-%     hold_total=[hold_total hold_tt];
-%     for i=i:8:input_bits-8
-%         %data_b(:,k )=data(c:c+7);
-%         data_c(c:c+7)=input_data(:, k);
-%         c=c+8;
-%         k=k+1;
-%     end
-%     for i=1:input_bits-8
-%         if(data_c(i)~=datar(i))%&&(mod(i,input_bits/dane_iter_max)<input_bits/dane_iter_max-3))
-%             error=error+1;
-%             i
-%         end
-%     end
-%     data_cc=[data_cc data_c];
-%     c=1;
-%     %data_c=[];
-% end
+input_bits=input_bytes*8;
+[setup_200_end, setup0_end, setup200_end, hold_200_end, hold0_end, hold200_end]=setup_hold_check_end(eq_dat, clk_vco, th0_all, th_200_all, th200_all); 
+setup_total_end=zeros(1,length(setup0_end));
+hold_total_end=zeros(1,length(setup0_end));
 
+for i=1:length(hold0_end)
+    A=[setup_200_end(i), setup0_end(i), setup200_end(i)];
+    setup_total_end(i)=min(A);
+    A=[hold_200_end(i), hold0_end(i), hold200_end(i)];
+    hold_total_end(i)=min(A);
+end
 
 % x=abs(data_c-data(1:input_bits-8));
 
 %% Dodatki----------------------------------------------------------------%
-% 
-% figure
-% plot(time, driv_data, time, eq_dat, time, clk(1:numel(driv_data));%, time, clk(1:numel(clk_shf)-120)*10);
-% ylabel('data driver, channel, clock');
-
-
-
 
 %     f_clks=freq_check(clk(1:length(driv_data)));
 %     figure
@@ -297,12 +252,12 @@ end
     figure
     plot(f_vcos)
     ylabel('cz. VCO w czasie transmisji danych');
-    figure
-    plot(v_int_num)
-    ylabel('wartosci akumulatora w czasie transmisji danych');
-    figure
-    plot(kps)
-    ylabel('wspolczynniki petli integracyjnej w czasie transmisji danych');
+%     figure
+%     plot(v_int_num)
+%     ylabel('wartosci akumulatora w czasie transmisji danych');
+%     figure
+%     plot(kps)
+%     ylabel('wspolczynniki petli integracyjnej w czasie transmisji danych');
     
 %     f_vcos=freq_check(clk_vco);
 %     figure
@@ -332,42 +287,20 @@ end
 figure
 plot(setup_total*1e12)
 ylabel('min setup time[ps]');
+% figure
+% plot(setup_200_end)
+% ylabel('setup zmierzony po zakonczeniu transmisji');
+% figure
+% plot(hold_total*1e12)
+% ylabel('min hold time[ps]');
 figure
-plot(hold_total*1e12)
+plot(hold_total_end(1:length(hold_total_end)-1)*1e12)
 ylabel('min hold time[ps]');
-% figure
-% plot(setup_200)
-% ylabel('setup 200');
-% figure
-% plot(setup0)
-% ylabel('setup 0');
-% figure
-% plot(setup200)
-% ylabel('setup -200');
-% figure
-% plot(hold_200)
-% ylabel('hold 200');
-% figure
-% plot(hold0)
-% ylabel('hold 0');
-% figure
-% plot(hold200)
-% ylabel('hold -200');
-% figure
-% plot(data)
-% ylabel('data recovered');
-% setup=setup';
-% holdd=holdd';
-% 
-% sl=zeros(1,vector_length2);
-% sl(1)=slope(clk(1:vector_length2));
-% for z=2:vector_length2
-%     sl(z)=slope(clk(sl(z-1):vector_length2));
-%     if(sl(z)==0)
-%         break;
-%     end
-% end
-%
+l_sh=min(length(hold_total_end),length(setup_total));
+figure
+plot((hold_total_end(1:l_sh)+setup_total(1:l_sh))*1e12)
+ylabel('setup/hold margin[ps]');
+%ylabel('hold zmierzony po zakonczeniu transmisji');
 figure
 % data_c=data_c(3:length(data_c));
 x=abs(data(1:length(data_c))-data_c);
