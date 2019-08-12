@@ -6,7 +6,6 @@ global UI_probes_mid;
 global PJ;
 global PJ_tot;
 global f_PJ;
-global peak_jit;
 global thr;
 vector_length2=round(vector_length*UI_probes_mid*4/T_mid);
 t_clks=zeros(1,vector_length2/10);
@@ -37,9 +36,9 @@ elseif(vector_length>l)
         slope_end_fall=slope_end_fall-1;
     end
     clk=clk(1:slope_end_fall);
-    [clk2,~,f_clk]=clk_gen_f_not_id5(f_clk,length(clk),vector_length,clk(slope_end-1),vector_length2,1);
+    [clk2,~,f_clk]=clk_gen_f_not_id5(f_clk,length(clk),vector_length,clk(slope_end-1),vector_length2,2);
     clk=[clk clk2];
     
-    figure
-    plot(clk(l-100:l+100));
+%     figure
+%     plot(clk(l-100:l+100));
 end
